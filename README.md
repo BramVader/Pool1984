@@ -12,7 +12,8 @@ of "1984" which we will use as well. This picture reveals a lot of details which
 to reconstruct the environt map later on. The problem with this picture is that is a scan of a printed
 document (with halftone dots), it is slightly skewed/rotated and the colors are off. I used a drawing
 program (Paint.NET) to correct the close-up as much as possible:
-![Close-up corrected](./Documentation/Close-up corrected.png)
+
+![Close-up corrected](./Documentation/Close-up%20corrected.png)
 
 Strategy
 --------
