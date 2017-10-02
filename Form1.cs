@@ -1319,8 +1319,8 @@ namespace Pool1984
             b = ((b & 0x33333333u) << 2) | ((b & 0xCCCCCCCCu) >> 2);
             b = ((b & 0x0F0F0F0Fu) << 4) | ((b & 0xF0F0F0F0u) >> 4);
             b = ((b & 0x00FF00FFu) << 8) | ((b & 0xFF00FF00u) >> 8);
-            double radicalInverseVDC = b * 2.3283064365386963e-10;
-            return new Vector2((double)i / numSamples, radicalInverseVDC);
+            double radicalInverseVDC = b * 2.0 * 2.3283064365386963e-10 - 1.0;
+            return new Vector2(i * 2.0 / numSamples - 1.0, radicalInverseVDC);
         }
 
         private Color3 RenderPixel(Vector2 coord)
@@ -1352,7 +1352,7 @@ namespace Pool1984
                 // Hack to have reflected the cloth not to much
                 Color3 diffuseColor =
                     (entity is Plane) && depth > 0 ?
-                    entity.DiffuseColor * 1.0 :
+                    entity.DiffuseColor * 0.1 :
                     entity.DiffuseColor;
 
                 // Calculate mirror ray
@@ -1381,13 +1381,13 @@ namespace Pool1984
                     var lightVec1 = light.Center - closest.Position;
 
                     var lightVec2 = lightVec1.Normalize();
-                    Vector3 hor = Vector3.Cross(new Vector3(0.0, 1.0, 0.0), lightVec2);
-                    Vector3 ver = Vector3.Cross(lightVec2, hor);
+                    Vector3 hor = Vector3.Cross(new Vector3(0.0, 1.0, 0.0), lightVec2).Normalize();
+                    Vector3 ver = Vector3.Cross(lightVec2, hor).Normalize();
 
-                    int shadowSamples = 3;
+                    int shadowSamples = 16;
                     for (int n = 0; n < shadowSamples; n++)
                     {
-                        Vector2 v1 = Hammersley(n, shadowSamples) * light.Radius2 - new Vector2(light.Radius2 * 0.5, light.Radius2 * 0.5);
+                        Vector2 v1 = Hammersley(n, shadowSamples) * light.Radius1;
 
                         var lightVec3 = lightVec1 + hor * v1.X + ver * v1.Y;
                         double lightDist = lightVec3.Length;
@@ -1404,7 +1404,7 @@ namespace Pool1984
                             }
                         }
                     }
-                    double shadow = 1.0 - shadowHit / 16;
+                    double shadow = 1.0 - (double)shadowHit / shadowSamples;
 
                     // Calculate specular highlight analyitically
                     double k =
