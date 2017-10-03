@@ -8,6 +8,7 @@ namespace Pool1984
     {
         public string Name { get; set; }
         public Color3 DiffuseColor { get; set; }
+        public Color3 BandColor { get; set; }
 
         public Matrix4 WorldToTexture { get; set; }
         public Matrix4 TextureToWorld { get; set; }
@@ -19,6 +20,7 @@ namespace Pool1984
 
         public abstract Intersection GetClosestIntersection(Ray ray, IntersectionMode mode, double minDist = Intersection.MinDistance, double maxDist = Intersection.MaxDistance);
 
-        public abstract Vector2 GetTextureCoordinates(Intersection closest);
+        public abstract Vector3 TransformNormal(Vector3 normal);
+        public abstract Vector2 GetTextureCoordinates(Vector3 transformedNormal);
     }
 }

@@ -110,6 +110,15 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Documentation\Close-up corrected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Documentation\Cubemap.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Documentation\Cubemap_small.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -14,6 +14,8 @@ namespace Pool1984
         public double MinAngle2 { get; set; }
         public double MaxAngle2 { get; set; }
 
+        public double CubeMapOffset { get; set; }
+
         // Original bitmap data
         public PointF PixelCenter { get; set; }
         public SizeF PixelSize { get; set; }
@@ -64,9 +66,13 @@ namespace Pool1984
             return intsec;
         }
 
-        public override Vector2 GetTextureCoordinates(Intersection closest)
+        public override Vector3 TransformNormal(Vector3 normal)
         {
-            Vector3 transformedNormal = closest.Normal * WorldToTexture;
+            return normal * WorldToTexture;
+        }
+
+        public override Vector2 GetTextureCoordinates(Vector3 transformedNormal)
+        {
             double angle1 = Math.Atan2(transformedNormal.Y, transformedNormal.X);
             double angle2 = Math.Atan2(transformedNormal.Z, new Vector2(transformedNormal.X, transformedNormal.Y).Length);
             return new Vector2(

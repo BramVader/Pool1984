@@ -34,7 +34,12 @@ namespace Pool1984
             return intsec;
         }
 
-        public override Vector2 GetTextureCoordinates(Intersection closest)
+        public override Vector3 TransformNormal(Vector3 normal)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Vector2 GetTextureCoordinates(Vector3 transformedNormal)
         {
             throw new NotImplementedException();
         }

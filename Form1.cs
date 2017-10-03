@@ -13,6 +13,7 @@ namespace Pool1984
     public partial class Form1 : Form
     {
         private static int textureSize = 512;
+        private static int cubeTextureSize = 128;
         private Color3 ambientColor = Color3.FromColor(Color.FromArgb(20, 20, 20));
         private Color3 numberTextureBlackColor = Color3.FromColor(Color.Black);
         private Color3 numberTextureWhiteColor = Color3.FromColor(Color.Ivory);
@@ -28,6 +29,9 @@ namespace Pool1984
             new Number { PixelCenter = new PointF(520.97f, 181.08f), PixelSize = new SizeF(98.21f, 93.10f), Degrees = 96f, OrientStart = new PointF(510.133877883348f, 199.192951606807f), OrientEnd = new PointF(534.889787403969f, 163.287449938223f) },		
             // Ball 8b
             new Number { PixelCenter = new PointF(486.89f, 205.26f), PixelSize = new SizeF(92.53f, 94.44f), Degrees = -4.8f, OrientStart = new PointF(498.228364144423f, 189.744135378232f), OrientEnd = new PointF(473.283478215247f, 225.271684397674f) },
+            // Ball 9a
+            new Number { PixelCenter = new PointF(288.97f, 209.33f), PixelSize = new SizeF(90.71f, 57.60f), Degrees = 41f, OrientStart = new PointF(282.606281983893f, 189.366182729089f), OrientEnd = new PointF(302.259828473547f, 220.736252607958f) },
+
         };
 
         private static PointF[][][] boxes = new PointF[][][]
@@ -105,9 +109,9 @@ namespace Pool1984
         private static ColorRef[] colorRefs = new ColorRef[] {
             new ColorRef { PixelCenter = new PointF(573.58f, 456.55f), Radius = 56.42f }, // Lightest part of the cloth
             new ColorRef { PixelCenter = new PointF(577.27f, 226.89f), Radius = 24.94f }, // Darkest part of the cloth (ambient color)
-            new ColorRef { PixelCenter = new PointF(86.20f, 287.82f), Radius = 35.91f }, // Cloth with shadow of lamp 1 (highest)
+            new ColorRef { PixelCenter = new PointF(86.20f, 287.82f), Radius = 35.91f }, // Cloth with shadow of lamp 1 (top)
             new ColorRef { PixelCenter = new PointF(398.50f, 575.20f), Radius = 20.52f }, // Cloth with shadow of lamp 2
-            new ColorRef { PixelCenter = new PointF(444.56f, 449.02f), Radius = 30.99f }, // Cloth with shadow of lamp 3 (lowest)
+            new ColorRef { PixelCenter = new PointF(444.56f, 449.02f), Radius = 30.99f }, // Cloth with shadow of lamp 3 (bottom)
             new ColorRef { PixelCenter = new PointF(83.24f, 134.94f), Radius = 20.41f }, // Lightest part of Ball 1
             new ColorRef { PixelCenter = new PointF(709.32f, 99.04f), Radius = 20.41f }, // Lightest part of Ball 4
             new ColorRef { PixelCenter = new PointF(304.50f, 545.56f), Radius = 20.41f }, // Lightest part of Ball w
@@ -117,16 +121,22 @@ namespace Pool1984
         };
 
         private Bitmap picture;
+        private Bitmap pictureDetail;
+
         private Bitmap renderBitmap;
         private Bitmap previewBitmap;
+        private Bitmap cubeMap;
+
         private Camera camera;
         private Camera viewCamera;
         private Entity[] entities;
 
         private Vector3[] pictureRect = new Vector3[4];
-        private float pictureScale = 4f;
+        private float pictureScale = 1f;
         private float pictureWidth, pictureHeight;
-        private RectangleF previewRect = new RectangleF(523f, 106f, 118f, 90f);
+        private RectangleF previewRect = new RectangleF(523f, 56f, 96f, 77f);
+
+        private RectangleF pictureDetailRect = new RectangleF(650f, 56f, 96f, 77f);
 
         private void CopyTexture(int offset, Ball ball)
         {
@@ -146,6 +156,9 @@ namespace Pool1984
             pictureWidth = picture.Width / pictureScale;
             pictureHeight = picture.Height / pictureScale;
 
+            pictureDetail = RenderBox.ErrorImage as Bitmap;
+            cubeMap = CubeMapBox.ErrorImage as Bitmap;
+
             MeasureColorRefs();
             double ambient = Math.Min(Math.Min(
                 colorRefs[1].Measured.R,
@@ -157,21 +170,24 @@ namespace Pool1984
 
             CubeMapContextActiveCubeMap.SelectedIndex = 0;
 
-            balls["Ball 1"].CubeMap = new Bitmap(256 * 6, 256, PixelFormat.Format24bppRgb);
-            balls["Ball 1"].SphereMap = new Bitmap(256, 256, PixelFormat.Format24bppRgb);
+            balls["Ball 1"].CubeMap = new Bitmap(textureSize * 4, textureSize, PixelFormat.Format24bppRgb);
+            balls["Ball 1"].SphereMap = new Bitmap(textureSize, textureSize, PixelFormat.Format24bppRgb);
             balls["Ball 1"].DiffuseColor = colorRefs[5].Measured - ambientColor;
             balls["Ball 1"].Number = numbers[0];
             balls["Ball 1"].Boxes = boxes[0];
 
-            balls["Ball 4"].CubeMap = new Bitmap(256 * 6, 256, PixelFormat.Format24bppRgb);
-            balls["Ball 4"].SphereMap = new Bitmap(256, 256, PixelFormat.Format24bppRgb);
+            balls["Ball 4"].CubeMap = new Bitmap(textureSize * 4, textureSize, PixelFormat.Format24bppRgb);
+            balls["Ball 4"].CubeMapOffset = -2;
+            balls["Ball 4"].SphereMap = new Bitmap(textureSize, textureSize, PixelFormat.Format24bppRgb);
             balls["Ball 4"].DiffuseColor = colorRefs[6].Measured - ambientColor;
             balls["Ball 4"].Number = numbers[1];
             balls["Ball 4"].Boxes = boxes[1];
 
+            balls["Ball 9a"].Number = numbers[4];
+            
             balls["Ball 8a"].Number = numbers[2];
             balls["Ball 8b"].Number = numbers[3];
-            balls["Ball 8b"].SphereMap = new Bitmap(256, 256, PixelFormat.Format24bppRgb);
+            balls["Ball 8b"].SphereMap = new Bitmap(textureSize, textureSize, PixelFormat.Format24bppRgb);
 
             balls["Ball w"].DiffuseColor = Color3.FromColor(Color.FromArgb(234, 246, 163));
 
@@ -186,7 +202,9 @@ namespace Pool1984
             balls["Ball 9c"].Texture = balls["Ball 9c"].Texture;
 
             RenderBox.Image = null;
+            RenderBox.ErrorImage = null;
             CubeMapBox.Image = null;
+            CubeMapBox.ErrorImage = null;
 
             var felt = new Plane
             {
@@ -195,10 +213,16 @@ namespace Pool1984
                 DiffuseColor = colorRefs[0].Measured - ambientColor
             };
 
-            entities = balls.Values.Concat(new Entity[] { felt }).ToArray();
-
+            entities = new Entity[]
+            {
+                balls["Ball 1"],
+                balls["Ball 9a"],
+                balls["Ball 8a"],
+                balls["Ball 4"],
+                balls["Ball w"],
+                felt
+            };
             this.MouseWheel += Form1_MouseWheel;
-
             this.camera = new Camera() { ApertureH = 7.4, ApertureV = 6.3 };
             this.viewCamera = this.camera.Clone();
 
@@ -230,7 +254,7 @@ namespace Pool1984
             );
         }
 
-        private Point DirToCubeMap(Vector3 dir, out int plane)
+        private PointF DirToCubeMap(Vector3 dir, int textureSize, out int plane)
         {
             plane =
                 Math.Abs(dir.X) > Math.Abs(dir.Y) && Math.Abs(dir.X) > Math.Abs(dir.Z) ? (dir.X > 0 ? 2 : 4) :
@@ -270,12 +294,9 @@ namespace Pool1984
                     planeY = -dir.Y * k;
                     break;
             }
-            int px = (int)(planeX * 128.0 + 128.0);
-            int py = (int)(128.0 - planeY * 128.0);
-            if (px < 0) px = 0;
-            if (py < 0) py = 0;
-            if (px > 255) px = 255;
-            if (py > 255) py = 255;
+            // Inverted x because it's a mirror image
+            int px = (int)((planeX * 0.5 + 0.5) * textureSize).Limit(0, textureSize - 1);
+            int py = (int)((0.5 - planeY * 0.5) * textureSize).Limit(0, textureSize - 1);
             return new Point(px, py);
         }
 
@@ -295,6 +316,8 @@ namespace Pool1984
                 e.Graphics.ScaleTransform(RenderBox.Zoom, RenderBox.Zoom);
 
                 e.Graphics.DrawImage(picture, 0f, 0f, pictureWidth, pictureHeight);
+                e.Graphics.DrawImage(pictureDetail, pictureDetailRect);
+
                 if (ViewRenderingCheckBox.Checked)
                 {
                     e.Graphics.DrawImage(renderBitmap, 0f, 0f);
@@ -608,11 +631,13 @@ namespace Pool1984
             e.Graphics.TranslateTransform(CubeMapBox.Offset.X, CubeMapBox.Offset.Y);
             e.Graphics.ScaleTransform(CubeMapBox.Zoom, CubeMapBox.Zoom);
 
+            PointF cubemapOffset = new PointF(textureSize + 30f, 0f);
+
             Ball selectedBall = balls[CubeMapContextActiveCubeMap.SelectedItem.ToString()];
             if (selectedBall.SphereMap != null)
                 e.Graphics.DrawImage(selectedBall.SphereMap, 0f, 0f);
             if (selectedBall.CubeMap != null)
-                e.Graphics.DrawImage(selectedBall.CubeMap, 300f, 0f);
+                e.Graphics.DrawImage(selectedBall.CubeMap, cubemapOffset);
 
             // Draw lines from balls to reflected boxes
             foreach (var ball in balls.Values)
@@ -623,7 +648,7 @@ namespace Pool1984
                     {
                         using (var pen = new Pen(Color.FromArgb(150, pens[boxNr].Color), 1.0f))
                         {
-                            Point p1 = default(Point), p2 = default(Point);
+                            PointF p1 = default(PointF), p2 = default(PointF);
                             for (int cornerNr = 0; cornerNr <= 4; cornerNr++)
                             {
                                 // Ray through a reflection (on the ball) of the corner of a box, seen from the camera
@@ -634,11 +659,18 @@ namespace Pool1984
                                 {
                                     // Calculate mirror vector;
                                     double a = -Vector3.Dot(intsec.Normal, ray.Direction);
-                                    Vector3 dir = ray.Direction + 2.0 * a * intsec.Normal;
+                                    Vector3 direction = ray.Direction + 2.0 * a * intsec.Normal;
 
-                                    int plane;
-                                    p2 = DirToCubeMap(dir, out plane);
-                                    p2.X = p2.X + plane * 256 + 300;
+                                    double cs = Math.Cos(ball.CubeMapOffset * Math.PI / 180.0);
+                                    double sn = Math.Sin(ball.CubeMapOffset * Math.PI / 180.0);
+                                    Vector3 transformed = new Vector3(
+                                        direction.X * cs + direction.Y * sn,
+                                        direction.Y * cs - direction.X * sn,
+                                        direction.Z
+                                    );
+                                    p2 = DirToCubeMap(transformed, textureSize, out int plane);
+                                    p2.X = p2.X + (plane - 1) * textureSize + cubemapOffset.X;
+                                    p2.Y = p2.Y + cubemapOffset.Y;
                                 }
                                 if (cornerNr > 0)
                                     e.Graphics.DrawLine(pen, p1, p2);
@@ -647,6 +679,10 @@ namespace Pool1984
                         }
                     }
                 }
+            }
+            for (int n = 1; n < 4; n++)
+            {
+                e.Graphics.DrawLine(Pens.Black, cubemapOffset.X + n * textureSize, 0f, cubemapOffset.X + n * textureSize, textureSize);
             }
 
             e.Graphics.ResetTransform();
@@ -964,27 +1000,31 @@ namespace Pool1984
                 var actual = RenderPixel(PixelToCoord(colorRefs[0].PixelCenter));
                 felt.DiffuseColor = felt.DiffuseColor + colorRefs[0].Measured - actual;
             }
+            
             // Calibrate ball 1 color
             var ball = balls["Ball 1"];
             for (int n = 0; n < 5; n++)
             {
                 var actual = RenderPixel(PixelToCoord(colorRefs[5].PixelCenter));
-                ball.DiffuseColor = ball.DiffuseColor + colorRefs[5].Measured - actual;
+                ball.BandColor = ball.DiffuseColor = ball.DiffuseColor + colorRefs[5].Measured - actual;
             }
+
             // Calibrate ball 4 color
             ball = balls["Ball 4"];
             for (int n = 0; n < 5; n++)
             {
                 var actual = RenderPixel(PixelToCoord(colorRefs[6].PixelCenter));
-                ball.DiffuseColor = ball.DiffuseColor + colorRefs[6].Measured - actual;
+                ball.BandColor = ball.DiffuseColor = ball.DiffuseColor + colorRefs[6].Measured - actual;
             }
+
             // Calibrate white ball color
             ball = balls["Ball w"];
             for (int n = 0; n < 5; n++)
             {
                 var actual = RenderPixel(PixelToCoord(colorRefs[7].PixelCenter));
-                ball.DiffuseColor = ball.DiffuseColor + colorRefs[7].Measured - actual;
+                ball.BandColor = ball.DiffuseColor = ball.DiffuseColor + colorRefs[7].Measured - actual;
             }
+
             // Calibrate reflection
             //for (int n = 0; n < 5; n++)
             //{
@@ -992,6 +1032,7 @@ namespace Pool1984
             //    reflection = reflection + colorRefs[8].Measured.G - actual.G;
             //}
             // Calibrate number texture white
+
             for (int n = 0; n < 5; n++)
             {
                 var actual = RenderPixel(PixelToCoord(colorRefs[9].PixelCenter));
@@ -1002,6 +1043,10 @@ namespace Pool1984
                 var actual = RenderPixel(PixelToCoord(colorRefs[10].PixelCenter));
                 numberTextureBlackColor = numberTextureBlackColor + colorRefs[10].Measured - actual;
             }
+
+            ball = balls["Ball 9a"];
+            ball.BandColor = balls["Ball 1"].DiffuseColor;
+            ball.DiffuseColor = balls["Ball w"].DiffuseColor;
         }
 
         private void MeasureColorRefs()
@@ -1030,7 +1075,6 @@ namespace Pool1984
                                 byte g = *adrRead++;
                                 byte r = *adrRead++;
                                 sum += Color3.FromColor(Color.FromArgb(r, g, b));
-                                if (colorRefNr == 10) Debug.Print($"{(int)(x + colorRef.PixelCenter.X):000}, {(int)(y + colorRef.PixelCenter.Y):000}: {r:000} {g:000} {b:000}");
                                 count++;
                             }
                         }
@@ -1062,6 +1106,8 @@ namespace Pool1984
                     var bmpDataWrite = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
                     // Reading from original picture
                     var bmpDataReadOriginal = picture.LockBits(new Rectangle(0, 0, picture.Width, picture.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+                    // Reading from rendered picture
+                    var bmpDataReadOriginalDetail = pictureDetail.LockBits(new Rectangle(0, 0, pictureDetail.Width, pictureDetail.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
                     // Reading from rendered picture
                     var bmpDataReadRendered = renderBitmap.LockBits(new Rectangle(0, 0, renderBitmap.Width, renderBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
 
@@ -1097,33 +1143,56 @@ namespace Pool1984
 
                                 // Conversion of direction vector to texture coords
                                 Vector3 direction = ray.Direction + 2.0 * a * intsec.Normal;
-
-                                int plane;
-                                Point p = DirToCubeMap(direction, out plane);
-
-                                unsafe
+                                double cs = Math.Cos(ball.CubeMapOffset * Math.PI / 180.0);
+                                double sn = Math.Sin(ball.CubeMapOffset * Math.PI / 180.0);
+                                Vector3 transformed = new Vector3(
+                                    direction.X * cs + direction.Y * sn,
+                                    direction.Y * cs - direction.X * sn,
+                                    direction.Z
+                                );
+                                PointF p = DirToCubeMap(transformed, textureSize, out int plane);
+                                if (plane > 0 && plane < 5)     // we render just the 4 sides
                                 {
-                                    var pixelCoord = CoordToPixel(new Vector2(x, y));
-                                    // Reading from original picture
-                                    byte* adrReadOriginal = (byte*)(bmpDataReadOriginal.Scan0 + (int)(pixelCoord.Y * pictureScale) * bmpDataReadOriginal.Stride + (int)(pixelCoord.X * pictureScale) * 3);
-                                    // Reading from rendered picture
-                                    byte* adrReadRendered = (byte*)(bmpDataReadRendered.Scan0 + (int)pixelCoord.Y * bmpDataReadRendered.Stride + (int)pixelCoord.X * 3);
-                                    // Writing to cube map
-                                    byte* adrWrite = (byte*)(bmpDataWrite.Scan0 + p.Y * bmpDataWrite.Stride + (p.X + plane * 256) * 3);
+                                    int planeOffset = (plane - 1) * textureSize;
+                                    unsafe
+                                    {
+                                        var pixelCoord = CoordToPixel(new Vector2(x, y));
+                                        PointF detailCoord = new PointF(
+                                            (pixelCoord.X - pictureDetailRect.X) * pictureDetail.Width / pictureDetailRect.Width,
+                                            (pixelCoord.Y - pictureDetailRect.Y) * pictureDetail.Height / pictureDetailRect.Height
+                                        );
 
-                                    int b1 = (*adrReadOriginal++ - *adrReadRendered++).Limit(0, 255);
-                                    int g1 = (*adrReadOriginal++ - *adrReadRendered++).Limit(0, 255);
-                                    int r1 = (*adrReadOriginal++ - *adrReadRendered++).Limit(0, 255);
+                                        byte* adrReadOriginal;
+                                        if (detailCoord.X >= 0 && detailCoord.X < pictureDetail.Width &&
+                                            detailCoord.Y >= 0 && detailCoord.Y < pictureDetail.Height)
+                                        {
+                                            adrReadOriginal = (byte*)(bmpDataReadOriginalDetail.Scan0 + (int)detailCoord.Y * bmpDataReadOriginalDetail.Stride + (int)detailCoord.X * 3);
+                                        }
+                                        else
+                                        {
+                                            // Reading from original picture
+                                            adrReadOriginal = (byte*)(bmpDataReadOriginal.Scan0 + (int)(pixelCoord.Y * pictureScale) * bmpDataReadOriginal.Stride + (int)(pixelCoord.X * pictureScale) * 3);
+                                        }
+                                        // Reading from rendered picture
+                                        byte* adrReadRendered = (byte*)(bmpDataReadRendered.Scan0 + (int)pixelCoord.Y * bmpDataReadRendered.Stride + (int)pixelCoord.X * 3);
+                                        // Writing to cube map
+                                        byte* adrWrite = (byte*)(bmpDataWrite.Scan0 + (int)p.Y * bmpDataWrite.Stride + ((int)p.X + planeOffset) * 3);
 
-                                    *adrWrite++ = (byte)b1;
-                                    *adrWrite++ = (byte)g1;
-                                    *adrWrite++ = (byte)r1;
+                                        int b1 = (*adrReadOriginal++ - *adrReadRendered++).Limit(0, 255);
+                                        int g1 = (*adrReadOriginal++ - *adrReadRendered++).Limit(0, 255);
+                                        int r1 = (*adrReadOriginal++ - *adrReadRendered++).Limit(0, 255);
+
+                                        *adrWrite++ = (byte)b1;
+                                        *adrWrite++ = (byte)g1;
+                                        *adrWrite++ = (byte)r1;
+                                    }
                                 }
                             }
                         }
 
                     renderBitmap.UnlockBits(bmpDataReadRendered);
                     picture.UnlockBits(bmpDataReadOriginal);
+                    pictureDetail.UnlockBits(bmpDataReadOriginalDetail);
                     bmp.UnlockBits(bmpDataWrite);
 
                 }
@@ -1214,12 +1283,12 @@ namespace Pool1984
 
         private void CubemapsRecalcCoarseMenuItem_Click(object sender, EventArgs e)
         {
-            CalculateCubeMaps(2f);
+            CalculateCubeMaps(0.5f);
         }
 
         private void CubemapsRecalcFineMenuItem_Click(object sender, EventArgs e)
         {
-            CalculateCubeMaps(0.5f);
+            CalculateCubeMaps(0.2f);
         }
 
         private void CubemapsCopyMenuItem_Click(object sender, EventArgs e)
@@ -1335,7 +1404,7 @@ namespace Pool1984
             Intersection closest = default(Intersection);
             foreach (var entity in entities)
             {
-                var intsec = entity.GetClosestIntersection(ray, IntersectionMode.PositionAndNormal);
+                var intsec = entity.GetClosestIntersection(ray, IntersectionMode.PositionAndNormal, maxDist: 100.0);
                 if (intsec.Hit)
                 {
                     if (intsec.Distance < closest.Distance || !closest.Hit)
@@ -1362,13 +1431,20 @@ namespace Pool1984
                 // Get texture
                 if (entity.Texture != null && entity.WorldToTexture.Valid)
                 {
-                    Vector2 p = entity.GetTextureCoordinates(closest);
-
+                    Vector3 transformedNormal = entity.TransformNormal(closest.Normal);
+                    Vector2 p = entity.GetTextureCoordinates(transformedNormal);
                     if (p.Length < 1.0)
                     {
                         Point q = new Point((int)((p.X * 0.5 + 0.5) * textureSize), (int)((p.Y * 0.5 + 0.5) * textureSize));
                         double f = entity.Texture.GetPixel(q.X, q.Y).R / 255.0;
                         diffuseColor = numberTextureBlackColor + (numberTextureWhiteColor - numberTextureBlackColor) * f;
+                    }
+                    else
+                    {
+                        if (Math.Abs(transformedNormal.X) < 0.5)
+                        {
+                            diffuseColor = entity.BandColor;
+                        }
                     }
                 }
 
@@ -1420,6 +1496,15 @@ namespace Pool1984
 
                     if (depth < 3 && !(entity is Plane))
                         col += reflection * RenderRay(mirrorRay, depth + 1);
+                }
+            }
+            else
+            // If no object hit, check the environment map
+            {
+                var px = DirToCubeMap(ray.Direction, cubeTextureSize, out int plane);
+                if (plane > 0 && plane < 5)
+                {
+                    col = Color3.FromColor(cubeMap.GetPixel((int)px.X + (plane - 1) * cubeTextureSize, (int)px.Y));
                 }
             }
             return col;

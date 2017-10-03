@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.RightPanel = new System.Windows.Forms.Panel();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.ViewColorRefsCheckBox = new System.Windows.Forms.CheckBox();
             this.ViewRenderingCheckBox = new System.Windows.Forms.CheckBox();
             this.ViewWireframeCheckBox = new System.Windows.Forms.CheckBox();
             this.RenderButton = new System.Windows.Forms.Button();
@@ -64,7 +65,6 @@
             this.OffsetYSetter = new Pool1984.ValueSetter();
             this.OffsetXSetter = new Pool1984.ValueSetter();
             this.CamDistSetter = new Pool1984.ValueSetter();
-            this.ViewColorRefsCheckBox = new System.Windows.Forms.CheckBox();
             this.RightPanel.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -99,6 +99,17 @@
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Rendering";
+            // 
+            // ViewColorRefsCheckBox
+            // 
+            this.ViewColorRefsCheckBox.AutoSize = true;
+            this.ViewColorRefsCheckBox.Location = new System.Drawing.Point(12, 76);
+            this.ViewColorRefsCheckBox.Name = "ViewColorRefsCheckBox";
+            this.ViewColorRefsCheckBox.Size = new System.Drawing.Size(96, 17);
+            this.ViewColorRefsCheckBox.TabIndex = 3;
+            this.ViewColorRefsCheckBox.Text = "View Color refs";
+            this.ViewColorRefsCheckBox.UseVisualStyleBackColor = true;
+            this.ViewColorRefsCheckBox.CheckedChanged += new System.EventHandler(this.ViewColorRefsCheckBox_CheckedChanged);
             // 
             // ViewRenderingCheckBox
             // 
@@ -328,7 +339,8 @@
             // 
             this.RenderBox.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.RenderBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RenderBox.Image = global::Pool1984.Properties.Resources.Original_inset;
+            this.RenderBox.ErrorImage = global::Pool1984.Properties.Resources.Close_up_corrected;
+            this.RenderBox.Image = global::Pool1984.Properties.Resources.Original;
             this.RenderBox.Location = new System.Drawing.Point(0, 0);
             this.RenderBox.Name = "RenderBox";
             this.RenderBox.Offset = ((System.Drawing.PointF)(resources.GetObject("RenderBox.Offset")));
@@ -344,6 +356,7 @@
             this.CubeMapBox.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.CubeMapBox.ContextMenuStrip = this.contextMenuStrip1;
             this.CubeMapBox.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.CubeMapBox.ErrorImage = global::Pool1984.Properties.Resources.Cubemap_small;
             this.CubeMapBox.Image = global::Pool1984.Properties.Resources.Ball_texture_2;
             this.CubeMapBox.Location = new System.Drawing.Point(0, 508);
             this.CubeMapBox.Name = "CubeMapBox";
@@ -351,7 +364,7 @@
             this.CubeMapBox.Size = new System.Drawing.Size(819, 315);
             this.CubeMapBox.TabIndex = 2;
             this.CubeMapBox.TabStop = false;
-            this.CubeMapBox.Zoom = 1F;
+            this.CubeMapBox.Zoom = 0.5F;
             this.CubeMapBox.Paint += new System.Windows.Forms.PaintEventHandler(this.CubeMapBox_Paint);
             // 
             // ViewRotation2Setter
@@ -444,17 +457,6 @@
             this.CamDistSetter.TabIndex = 1;
             this.CamDistSetter.Value = 5D;
             this.CamDistSetter.ValueChanged += new System.EventHandler(this.CamDistSetter_ValueChanged);
-            // 
-            // ViewColorRefsCheckBox
-            // 
-            this.ViewColorRefsCheckBox.AutoSize = true;
-            this.ViewColorRefsCheckBox.Location = new System.Drawing.Point(12, 76);
-            this.ViewColorRefsCheckBox.Name = "ViewColorRefsCheckBox";
-            this.ViewColorRefsCheckBox.Size = new System.Drawing.Size(96, 17);
-            this.ViewColorRefsCheckBox.TabIndex = 3;
-            this.ViewColorRefsCheckBox.Text = "View Color refs";
-            this.ViewColorRefsCheckBox.UseVisualStyleBackColor = true;
-            this.ViewColorRefsCheckBox.CheckedChanged += new System.EventHandler(this.ViewColorRefsCheckBox_CheckedChanged);
             // 
             // Form1
             // 
