@@ -28,5 +28,8 @@ This will be used to recreate 'clean' textures which will be used in the final r
 
 
 
+Result so far:
+
+![Result](./Documentation/Result.png)
 
 
