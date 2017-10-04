@@ -13,11 +13,16 @@ namespace Pool1984
     public partial class Form1 : Form
     {
         private static int textureSize = 512;
-        private static int cubeTextureSize = 128;
+        private static int cubeTextureSize = 512;
         private Color3 ambientColor = Color3.FromColor(Color.FromArgb(20, 20, 20));
         private Color3 numberTextureBlackColor = Color3.FromColor(Color.Black);
         private Color3 numberTextureWhiteColor = Color3.FromColor(Color.Ivory);
         private double reflection = 0.2;
+
+        private int nrSamplesX = 4;
+        private int nrSamplesY = 4;
+
+        private Plane felt;
 
         private static Number[] numbers = new Number[]
         {
@@ -206,7 +211,7 @@ namespace Pool1984
             CubeMapBox.Image = null;
             CubeMapBox.ErrorImage = null;
 
-            var felt = new Plane
+            felt = new Plane
             {
                 Center = new Vector3(0.0, 0.0, 0.0),
                 Normal = new Vector3(0.0, 0.0, 1.0),
@@ -527,6 +532,33 @@ namespace Pool1984
                     }
                 }
 
+                // Draw shadow outlines
+                for (int lightNr = 0; lightNr < lights.Length; lightNr++)
+                {
+                    var light = lights[lightNr];
+                    using (var pen = new Pen(Color.FromArgb(100, pens[lightNr].Color), 0.5f))
+                    {
+                        foreach (var ball in balls.Values)
+                        {
+                            Vector3 va = light.Center - ball.Center;
+                            Vector3 vb = Vector3.Cross(va, new Vector3(1.0, 0.0, 0.0)).Normalize();
+                            Vector3 vc = Vector3.Cross(vb, va).Normalize();
+                            for (int n = 0; n < 90; n++)
+                            {
+                                double f1 = Math.Cos(n * Math.PI / 45.0);
+                                double f2 = Math.Sin(n * Math.PI / 45.0);
+                                Ray ray = new Ray { Origin = light.Center, Direction = (ball.Center + f1 * vb + f2 * vc - light.Center).Normalize() };
+                                var intsec = felt.GetClosestIntersection(ray, IntersectionMode.Position);
+                                p2 = intsec.Position;
+                                if (n > 0)
+                                    e.Graphics.DrawLine(pen, CoordToPixel(renderCamera.VertexToCoord(p1)), CoordToPixel(renderCamera.VertexToCoord(p2)));
+                                p1 = p2;
+                            }
+                        }
+                    }
+                }
+
+
                 // Draw lights
                 for (int lightNr = 0; lightNr < lights.Length; lightNr++)
                 {
@@ -690,8 +722,7 @@ namespace Pool1984
 
         private void Form1_MouseWheel(object sender, MouseEventArgs e)
         {
-            var control = this.GetControlAt(e.Location) as ZoomablePictureBox;
-            if (control != null)
+            if (this.GetControlAt(e.Location) is ZoomablePictureBox control)
             {
                 Point p1 = this.PointToClient(default(Point));
                 Point p2 = control.PointToClient(default(Point));
@@ -997,7 +1028,7 @@ namespace Pool1984
             var felt = entities.OfType<Plane>().First();
             for (int n = 0; n < 5; n++)
             {
-                var actual = RenderPixel(PixelToCoord(colorRefs[0].PixelCenter));
+                var actual = RenderPixel(colorRefs[0].PixelCenter);
                 felt.DiffuseColor = felt.DiffuseColor + colorRefs[0].Measured - actual;
             }
             
@@ -1005,7 +1036,7 @@ namespace Pool1984
             var ball = balls["Ball 1"];
             for (int n = 0; n < 5; n++)
             {
-                var actual = RenderPixel(PixelToCoord(colorRefs[5].PixelCenter));
+                var actual = RenderPixel(colorRefs[5].PixelCenter);
                 ball.BandColor = ball.DiffuseColor = ball.DiffuseColor + colorRefs[5].Measured - actual;
             }
 
@@ -1013,7 +1044,7 @@ namespace Pool1984
             ball = balls["Ball 4"];
             for (int n = 0; n < 5; n++)
             {
-                var actual = RenderPixel(PixelToCoord(colorRefs[6].PixelCenter));
+                var actual = RenderPixel(colorRefs[6].PixelCenter);
                 ball.BandColor = ball.DiffuseColor = ball.DiffuseColor + colorRefs[6].Measured - actual;
             }
 
@@ -1021,7 +1052,7 @@ namespace Pool1984
             ball = balls["Ball w"];
             for (int n = 0; n < 5; n++)
             {
-                var actual = RenderPixel(PixelToCoord(colorRefs[7].PixelCenter));
+                var actual = RenderPixel(colorRefs[7].PixelCenter);
                 ball.BandColor = ball.DiffuseColor = ball.DiffuseColor + colorRefs[7].Measured - actual;
             }
 
@@ -1035,12 +1066,12 @@ namespace Pool1984
 
             for (int n = 0; n < 5; n++)
             {
-                var actual = RenderPixel(PixelToCoord(colorRefs[9].PixelCenter));
+                var actual = RenderPixel(colorRefs[9].PixelCenter);
                 numberTextureWhiteColor = numberTextureWhiteColor + colorRefs[9].Measured - actual;
             }
             for (int n = 0; n < 5; n++)
             {
-                var actual = RenderPixel(PixelToCoord(colorRefs[10].PixelCenter));
+                var actual = RenderPixel(colorRefs[10].PixelCenter);
                 numberTextureBlackColor = numberTextureBlackColor + colorRefs[10].Measured - actual;
             }
 
@@ -1368,10 +1399,9 @@ namespace Pool1984
                 (int)((e.X - RenderBox.Offset.X) / RenderBox.Zoom),
                 (int)((e.Y - RenderBox.Offset.Y) / RenderBox.Zoom)
             );
-            Vector2 coord = new Vector2(p.X * 2f / renderBitmap.Width - 1f, 1f - p.Y * 2f / renderBitmap.Height);
-            if (coord.X >= -1.0 && coord.X <= 1.0 && coord.Y >= -1.0 && coord.Y <= 1.0)
+            if (p.X >= 0 && p.X <= renderBitmap.Width && p.Y >= 0 && p.Y <= renderBitmap.Height)
             {
-                Color3 col = RenderPixel(coord);
+                Color3 col = RenderPixel(p);
                 RenderButton.BackColor = col.ToColor();
             }
             else
@@ -1392,10 +1422,26 @@ namespace Pool1984
             return new Vector2(i * 2.0 / numSamples - 1.0, radicalInverseVDC);
         }
 
-        private Color3 RenderPixel(Vector2 coord)
+        private Random rnd = new Random();
+        private Func<Random, double> rndNext = (rnd) => rnd.Next() / (double)int.MaxValue;
+
+        private Color3 RenderPixel(PointF point)
         {
-            Ray ray = camera.CoordToRay(coord);
-            return RenderRay(ray);
+            Color3 color = new Color3();
+            for (int sampleY = 0; sampleY < nrSamplesY; sampleY++)
+            {
+                for (int sampleX = 0; sampleX < nrSamplesX; sampleX++)
+                {
+                    PointF point2 = new PointF(
+                        point.X + (float)(sampleX + rndNext(rnd)) / nrSamplesX, 
+                        point.Y + (float)(sampleY + rndNext(rnd)) / nrSamplesY
+                    );
+                    Vector2 coord = PixelToCoord(point2);
+                    Ray ray = camera.CoordToRay(coord);
+                    color += RenderRay(ray);
+                }
+            }
+            return color / (nrSamplesX * nrSamplesY);
         }
 
         private Color3 RenderRay(Ray ray, int depth = 0)
@@ -1418,7 +1464,7 @@ namespace Pool1984
             {
                 Entity entity = closest.Entity;
 
-                // Hack to have reflected the cloth not to much
+                // Hack to have reflected the cloth not too much
                 Color3 diffuseColor =
                     (entity is Plane) && depth > 0 ?
                     entity.DiffuseColor * 0.1 :
@@ -1449,38 +1495,31 @@ namespace Pool1984
                 }
 
                 // Calculate lights
-                Random rnd = new Random();
                 for (int lightNr = 0; lightNr < lights.Length; lightNr++)
                 {
                     var light = lights[lightNr];
-                    int shadowHit = 0;
                     var lightVec1 = light.Center - closest.Position;
 
                     var lightVec2 = lightVec1.Normalize();
                     Vector3 hor = Vector3.Cross(new Vector3(0.0, 1.0, 0.0), lightVec2).Normalize();
                     Vector3 ver = Vector3.Cross(lightVec2, hor).Normalize();
 
-                    int shadowSamples = 16;
-                    for (int n = 0; n < shadowSamples; n++)
+                    Vector2 v1 = new Vector2(rndNext(rnd) * 2.0 - 1.0, rndNext(rnd) * 2.0 - 1.0) * light.Radius1;
+                    var lightVec3 = lightVec1 + hor * v1.X + ver * v1.Y;
+                    double lightDist = lightVec3.Length;
+
+                    Ray shadowRay = new Ray { Origin = closest.Position, Direction = lightVec3 / lightDist };
+
+                    double shadow = 1.0;
+                    foreach (var shadowEntity in entities)
                     {
-                        Vector2 v1 = Hammersley(n, shadowSamples) * light.Radius1;
-
-                        var lightVec3 = lightVec1 + hor * v1.X + ver * v1.Y;
-                        double lightDist = lightVec3.Length;
-
-                        Ray shadowRay = new Ray { Origin = closest.Position, Direction = lightVec3 / lightDist };
-
-                        foreach (var shadowEntity in entities)
+                        var intsec = shadowEntity.GetClosestIntersection(shadowRay, IntersectionMode.Hit, Intersection.MinDistance, lightDist);
+                        if (intsec.Hit)
                         {
-                            var intsec = shadowEntity.GetClosestIntersection(shadowRay, IntersectionMode.Hit, Intersection.MinDistance, lightDist);
-                            if (intsec.Hit)
-                            {
-                                shadowHit++;
-                                break;
-                            }
+                            shadow = 0.0;
+                            break;
                         }
                     }
-                    double shadow = 1.0 - (double)shadowHit / shadowSamples;
 
                     // Calculate specular highlight analyitically
                     double k =
@@ -1515,37 +1554,17 @@ namespace Pool1984
             int width = renderBitmap.Width;
             int height = renderBitmap.Height;
             Camera camera = this.camera.Clone();
-            Color3[] prevCornerData = new Color3[width];
-            var halfPixel = new Vector2(1.0 / width, -1.0 / height);
-
-            // -1: Start with an extra line for correct antialiasing
-            for (int y = -1; y < height; y++)
+            for (int y = 0; y < height; y++)
             {
                 int adr = 0;
                 byte[] lineData = new byte[width * 3];
-                Color3 topLeftColor = new Color3();
-                Vector2 coord = new Vector2(-1 * 2.0 / width - 1.0, 1.0 - y * 2.0 / height);
-                Color3 bottomLeftColor = RenderPixel(coord);
                 for (int x = 0; x < width; x++)
                 {
-                    coord = new Vector2(x * 2.0 / width - 1.0, 1.0 - y * 2.0 / height);
-                    Color3 centerColor = RenderPixel(coord);
-                    Color3 bottomRightColor = RenderPixel(coord + halfPixel);
-                    Color3 topRightColor = prevCornerData[x];
-
-                    var resultColor = new Color3(
-                        (centerColor.R * 2.0 + topLeftColor.R + topRightColor.R + bottomLeftColor.R + bottomRightColor.R) / 6.0,
-                        (centerColor.G * 2.0 + topLeftColor.G + topRightColor.G + bottomLeftColor.G + bottomRightColor.G) / 6.0,
-                        (centerColor.B * 2.0 + topLeftColor.B + topRightColor.B + bottomLeftColor.B + bottomRightColor.B) / 6.0
-                    ).ToColor();
-
+                    Color3 color = RenderPixel(new PointF(x, y));
+                    var resultColor = color.ToColor();
                     lineData[adr++] = (resultColor.B);
                     lineData[adr++] = (resultColor.G);
                     lineData[adr++] = (resultColor.R);
-
-                    prevCornerData[x] = bottomRightColor;
-                    topLeftColor = topRightColor;
-                    bottomLeftColor = bottomRightColor;
                 }
                 if (y >= 0)
                 {

@@ -127,9 +127,6 @@
   <data name="Ball texture" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Textures\Ball texture.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Original+inset" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Documentation\Original+inset.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="Cubemap" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Documentation\Cubemap.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

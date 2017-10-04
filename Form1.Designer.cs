@@ -38,7 +38,14 @@
             this.RenderButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ViewEnabledCheckbox = new System.Windows.Forms.CheckBox();
+            this.ViewRotation2Setter = new Pool1984.ValueSetter();
+            this.ViewRotation1Setter = new Pool1984.ValueSetter();
+            this.ViewDistanceSetter = new Pool1984.ValueSetter();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.CamRotationSetter = new Pool1984.ValueSetter();
+            this.OffsetYSetter = new Pool1984.ValueSetter();
+            this.OffsetXSetter = new Pool1984.ValueSetter();
+            this.CamDistSetter = new Pool1984.ValueSetter();
             this.label1 = new System.Windows.Forms.Label();
             this.ApertureVLabel = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -55,16 +62,9 @@
             this.splitter1 = new System.Windows.Forms.Splitter();
             this.LeftPanel = new System.Windows.Forms.Panel();
             this.splitter2 = new System.Windows.Forms.Splitter();
-            this.rerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.RenderBox = new Pool1984.ZoomablePictureBox();
             this.CubeMapBox = new Pool1984.ZoomablePictureBox();
-            this.ViewRotation2Setter = new Pool1984.ValueSetter();
-            this.ViewRotation1Setter = new Pool1984.ValueSetter();
-            this.ViewDistanceSetter = new Pool1984.ValueSetter();
-            this.CamRotationSetter = new Pool1984.ValueSetter();
-            this.OffsetYSetter = new Pool1984.ValueSetter();
-            this.OffsetXSetter = new Pool1984.ValueSetter();
-            this.CamDistSetter = new Pool1984.ValueSetter();
+            this.rerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.RightPanel.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -171,6 +171,45 @@
             this.ViewEnabledCheckbox.UseVisualStyleBackColor = true;
             this.ViewEnabledCheckbox.CheckedChanged += new System.EventHandler(this.ViewEnabledCheckbox_CheckedChanged);
             // 
+            // ViewRotation2Setter
+            // 
+            this.ViewRotation2Setter.Dimension = "°";
+            this.ViewRotation2Setter.Label = "Rotation 2";
+            this.ViewRotation2Setter.Location = new System.Drawing.Point(8, 105);
+            this.ViewRotation2Setter.Max = 360D;
+            this.ViewRotation2Setter.Min = 0D;
+            this.ViewRotation2Setter.Name = "ViewRotation2Setter";
+            this.ViewRotation2Setter.Size = new System.Drawing.Size(225, 23);
+            this.ViewRotation2Setter.TabIndex = 2;
+            this.ViewRotation2Setter.Value = 4.9968D;
+            this.ViewRotation2Setter.ValueChanged += new System.EventHandler(this.ViewSetter_ValueChanged);
+            // 
+            // ViewRotation1Setter
+            // 
+            this.ViewRotation1Setter.Dimension = "°";
+            this.ViewRotation1Setter.Label = "Rotation 1";
+            this.ViewRotation1Setter.Location = new System.Drawing.Point(8, 76);
+            this.ViewRotation1Setter.Max = -0.1D;
+            this.ViewRotation1Setter.Min = -90D;
+            this.ViewRotation1Setter.Name = "ViewRotation1Setter";
+            this.ViewRotation1Setter.Size = new System.Drawing.Size(225, 23);
+            this.ViewRotation1Setter.TabIndex = 2;
+            this.ViewRotation1Setter.Value = -30.00074D;
+            this.ViewRotation1Setter.ValueChanged += new System.EventHandler(this.ViewSetter_ValueChanged);
+            // 
+            // ViewDistanceSetter
+            // 
+            this.ViewDistanceSetter.Dimension = "";
+            this.ViewDistanceSetter.Label = "Distance";
+            this.ViewDistanceSetter.Location = new System.Drawing.Point(8, 47);
+            this.ViewDistanceSetter.Max = 2000D;
+            this.ViewDistanceSetter.Min = 0.1D;
+            this.ViewDistanceSetter.Name = "ViewDistanceSetter";
+            this.ViewDistanceSetter.Size = new System.Drawing.Size(225, 23);
+            this.ViewDistanceSetter.TabIndex = 2;
+            this.ViewDistanceSetter.Value = 34.978256D;
+            this.ViewDistanceSetter.ValueChanged += new System.EventHandler(this.ViewSetter_ValueChanged);
+            // 
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -189,6 +228,58 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Camera";
+            // 
+            // CamRotationSetter
+            // 
+            this.CamRotationSetter.Dimension = "°";
+            this.CamRotationSetter.Label = "Rotation";
+            this.CamRotationSetter.Location = new System.Drawing.Point(8, 106);
+            this.CamRotationSetter.Max = 360D;
+            this.CamRotationSetter.Min = 0D;
+            this.CamRotationSetter.Name = "CamRotationSetter";
+            this.CamRotationSetter.Size = new System.Drawing.Size(247, 23);
+            this.CamRotationSetter.TabIndex = 1;
+            this.CamRotationSetter.Value = 34.9992D;
+            this.CamRotationSetter.ValueChanged += new System.EventHandler(this.CamRotationSetter_ValueChanged);
+            // 
+            // OffsetYSetter
+            // 
+            this.OffsetYSetter.Dimension = "";
+            this.OffsetYSetter.Label = "Offset Y";
+            this.OffsetYSetter.Location = new System.Drawing.Point(8, 77);
+            this.OffsetYSetter.Max = 2D;
+            this.OffsetYSetter.Min = -2D;
+            this.OffsetYSetter.Name = "OffsetYSetter";
+            this.OffsetYSetter.Size = new System.Drawing.Size(247, 23);
+            this.OffsetYSetter.TabIndex = 1;
+            this.OffsetYSetter.Value = -0.00019999999999997797D;
+            this.OffsetYSetter.ValueChanged += new System.EventHandler(this.CamRotationSetter_ValueChanged);
+            // 
+            // OffsetXSetter
+            // 
+            this.OffsetXSetter.Dimension = "";
+            this.OffsetXSetter.Label = "Offset X";
+            this.OffsetXSetter.Location = new System.Drawing.Point(8, 48);
+            this.OffsetXSetter.Max = 2D;
+            this.OffsetXSetter.Min = -2D;
+            this.OffsetXSetter.Name = "OffsetXSetter";
+            this.OffsetXSetter.Size = new System.Drawing.Size(247, 23);
+            this.OffsetXSetter.TabIndex = 1;
+            this.OffsetXSetter.Value = -0.0042400000000000215D;
+            this.OffsetXSetter.ValueChanged += new System.EventHandler(this.CamRotationSetter_ValueChanged);
+            // 
+            // CamDistSetter
+            // 
+            this.CamDistSetter.Dimension = "";
+            this.CamDistSetter.Label = "Distance";
+            this.CamDistSetter.Location = new System.Drawing.Point(8, 19);
+            this.CamDistSetter.Max = 100D;
+            this.CamDistSetter.Min = 5D;
+            this.CamDistSetter.Name = "CamDistSetter";
+            this.CamDistSetter.Size = new System.Drawing.Size(247, 23);
+            this.CamDistSetter.TabIndex = 1;
+            this.CamDistSetter.Value = 5D;
+            this.CamDistSetter.ValueChanged += new System.EventHandler(this.CamDistSetter_ValueChanged);
             // 
             // label1
             // 
@@ -329,12 +420,6 @@
             this.splitter2.TabIndex = 1;
             this.splitter2.TabStop = false;
             // 
-            // rerToolStripMenuItem
-            // 
-            this.rerToolStripMenuItem.Name = "rerToolStripMenuItem";
-            this.rerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.rerToolStripMenuItem.Text = "rer";
-            // 
             // RenderBox
             // 
             this.RenderBox.BackColor = System.Drawing.SystemColors.ControlDarkDark;
@@ -356,7 +441,7 @@
             this.CubeMapBox.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.CubeMapBox.ContextMenuStrip = this.contextMenuStrip1;
             this.CubeMapBox.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.CubeMapBox.ErrorImage = global::Pool1984.Properties.Resources.Cubemap_small;
+            this.CubeMapBox.ErrorImage = global::Pool1984.Properties.Resources.Cubemap;
             this.CubeMapBox.Image = global::Pool1984.Properties.Resources.Ball_texture_2;
             this.CubeMapBox.Location = new System.Drawing.Point(0, 508);
             this.CubeMapBox.Name = "CubeMapBox";
@@ -367,96 +452,11 @@
             this.CubeMapBox.Zoom = 0.5F;
             this.CubeMapBox.Paint += new System.Windows.Forms.PaintEventHandler(this.CubeMapBox_Paint);
             // 
-            // ViewRotation2Setter
+            // rerToolStripMenuItem
             // 
-            this.ViewRotation2Setter.Dimension = "°";
-            this.ViewRotation2Setter.Label = "Rotation 2";
-            this.ViewRotation2Setter.Location = new System.Drawing.Point(8, 105);
-            this.ViewRotation2Setter.Max = 360D;
-            this.ViewRotation2Setter.Min = 0D;
-            this.ViewRotation2Setter.Name = "ViewRotation2Setter";
-            this.ViewRotation2Setter.Size = new System.Drawing.Size(225, 23);
-            this.ViewRotation2Setter.TabIndex = 2;
-            this.ViewRotation2Setter.Value = 4.9968D;
-            this.ViewRotation2Setter.ValueChanged += new System.EventHandler(this.ViewSetter_ValueChanged);
-            // 
-            // ViewRotation1Setter
-            // 
-            this.ViewRotation1Setter.Dimension = "°";
-            this.ViewRotation1Setter.Label = "Rotation 1";
-            this.ViewRotation1Setter.Location = new System.Drawing.Point(8, 76);
-            this.ViewRotation1Setter.Max = -0.1D;
-            this.ViewRotation1Setter.Min = -90D;
-            this.ViewRotation1Setter.Name = "ViewRotation1Setter";
-            this.ViewRotation1Setter.Size = new System.Drawing.Size(225, 23);
-            this.ViewRotation1Setter.TabIndex = 2;
-            this.ViewRotation1Setter.Value = -30.00074D;
-            this.ViewRotation1Setter.ValueChanged += new System.EventHandler(this.ViewSetter_ValueChanged);
-            // 
-            // ViewDistanceSetter
-            // 
-            this.ViewDistanceSetter.Dimension = "";
-            this.ViewDistanceSetter.Label = "Distance";
-            this.ViewDistanceSetter.Location = new System.Drawing.Point(8, 47);
-            this.ViewDistanceSetter.Max = 2000D;
-            this.ViewDistanceSetter.Min = 0.1D;
-            this.ViewDistanceSetter.Name = "ViewDistanceSetter";
-            this.ViewDistanceSetter.Size = new System.Drawing.Size(225, 23);
-            this.ViewDistanceSetter.TabIndex = 2;
-            this.ViewDistanceSetter.Value = 34.978256D;
-            this.ViewDistanceSetter.ValueChanged += new System.EventHandler(this.ViewSetter_ValueChanged);
-            // 
-            // CamRotationSetter
-            // 
-            this.CamRotationSetter.Dimension = "°";
-            this.CamRotationSetter.Label = "Rotation";
-            this.CamRotationSetter.Location = new System.Drawing.Point(8, 106);
-            this.CamRotationSetter.Max = 360D;
-            this.CamRotationSetter.Min = 0D;
-            this.CamRotationSetter.Name = "CamRotationSetter";
-            this.CamRotationSetter.Size = new System.Drawing.Size(247, 23);
-            this.CamRotationSetter.TabIndex = 1;
-            this.CamRotationSetter.Value = 34.9992D;
-            this.CamRotationSetter.ValueChanged += new System.EventHandler(this.CamRotationSetter_ValueChanged);
-            // 
-            // OffsetYSetter
-            // 
-            this.OffsetYSetter.Dimension = "";
-            this.OffsetYSetter.Label = "Offset Y";
-            this.OffsetYSetter.Location = new System.Drawing.Point(8, 77);
-            this.OffsetYSetter.Max = 2D;
-            this.OffsetYSetter.Min = -2D;
-            this.OffsetYSetter.Name = "OffsetYSetter";
-            this.OffsetYSetter.Size = new System.Drawing.Size(247, 23);
-            this.OffsetYSetter.TabIndex = 1;
-            this.OffsetYSetter.Value = -0.00019999999999997797D;
-            this.OffsetYSetter.ValueChanged += new System.EventHandler(this.CamRotationSetter_ValueChanged);
-            // 
-            // OffsetXSetter
-            // 
-            this.OffsetXSetter.Dimension = "";
-            this.OffsetXSetter.Label = "Offset X";
-            this.OffsetXSetter.Location = new System.Drawing.Point(8, 48);
-            this.OffsetXSetter.Max = 2D;
-            this.OffsetXSetter.Min = -2D;
-            this.OffsetXSetter.Name = "OffsetXSetter";
-            this.OffsetXSetter.Size = new System.Drawing.Size(247, 23);
-            this.OffsetXSetter.TabIndex = 1;
-            this.OffsetXSetter.Value = -0.0042400000000000215D;
-            this.OffsetXSetter.ValueChanged += new System.EventHandler(this.CamRotationSetter_ValueChanged);
-            // 
-            // CamDistSetter
-            // 
-            this.CamDistSetter.Dimension = "";
-            this.CamDistSetter.Label = "Distance";
-            this.CamDistSetter.Location = new System.Drawing.Point(8, 19);
-            this.CamDistSetter.Max = 100D;
-            this.CamDistSetter.Min = 5D;
-            this.CamDistSetter.Name = "CamDistSetter";
-            this.CamDistSetter.Size = new System.Drawing.Size(247, 23);
-            this.CamDistSetter.TabIndex = 1;
-            this.CamDistSetter.Value = 5D;
-            this.CamDistSetter.ValueChanged += new System.EventHandler(this.CamDistSetter_ValueChanged);
+            this.rerToolStripMenuItem.Name = "rerToolStripMenuItem";
+            this.rerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.rerToolStripMenuItem.Text = "rer";
             // 
             // Form1
             // 
