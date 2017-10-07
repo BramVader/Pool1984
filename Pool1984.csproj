@@ -69,6 +69,7 @@
     <Compile Include="Math\Vector3.cs" />
     <Compile Include="Models\Box.cs" />
     <Compile Include="Models\Ellipse.cs" />
+    <Compile Include="Models\Keyframe.cs" />
     <Compile Include="Models\Light.cs" />
     <Compile Include="Models\Number.cs" />
     <Compile Include="ExtensionMethods.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Primitives\BallPosition.cs" />
     <Compile Include="Primitives\Ball.cs" />
     <Compile Include="Primitives\Entity.cs" />
     <Compile Include="Primitives\Plane.cs" />

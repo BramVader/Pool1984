@@ -75,5 +75,10 @@ namespace Pool1984
         {
             return Normalize(this);
         }
+
+        public override string ToString()
+        {
+            return $" [{X:0.00}, {Y:0.00}, {Z:0.00}] ";
+        }
     }
 }

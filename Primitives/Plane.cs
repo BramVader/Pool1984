@@ -13,7 +13,7 @@ namespace Pool1984
         {
         }
 
-        public override Intersection GetClosestIntersection(Ray ray, IntersectionMode mode, double minDist = Intersection.MinDistance, double maxDist = Intersection.MaxDistance)
+        public override Intersection GetClosestIntersection(Ray ray, IntersectionMode mode, double time, double minDist = Intersection.MinDistance, double maxDist = Intersection.MaxDistance)
         {
             Intersection intsec = new Intersection() { Entity = this };
 
@@ -34,7 +34,7 @@ namespace Pool1984
             return intsec;
         }
 
-        public override Vector3 TransformNormal(Vector3 normal)
+        public override Vector3 TransformNormal(Vector3 normal, double time)
         {
             throw new NotImplementedException();
         }
