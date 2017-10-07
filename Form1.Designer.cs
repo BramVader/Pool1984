@@ -31,11 +31,21 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.RightPanel = new System.Windows.Forms.Panel();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.ViewColorRefsCheckBox = new System.Windows.Forms.CheckBox();
-            this.ViewRenderingCheckBox = new System.Windows.Forms.CheckBox();
-            this.ViewWireframeCheckBox = new System.Windows.Forms.CheckBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.SaveRenderingButton = new System.Windows.Forms.Button();
             this.RenderButton = new System.Windows.Forms.Button();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.timeSetter = new Pool1984.ValueSetter();
+            this.ViewLightsCheckBox = new System.Windows.Forms.CheckBox();
+            this.ViewColorRefsCheckBox = new System.Windows.Forms.CheckBox();
+            this.ViewNumbersFlatCheckBox = new System.Windows.Forms.CheckBox();
+            this.ViewGridCheckBox = new System.Windows.Forms.CheckBox();
+            this.ViewNumbers3DCheckBox = new System.Windows.Forms.CheckBox();
+            this.ViewShadowOutlinesCheckBox = new System.Windows.Forms.CheckBox();
+            this.ViewBoxesCheckbox = new System.Windows.Forms.CheckBox();
+            this.ViewRenderingCheckBox = new System.Windows.Forms.CheckBox();
+            this.ViewBallsCheckBox = new System.Windows.Forms.CheckBox();
+            this.ViewBallOutlineFlatCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ViewEnabledCheckbox = new System.Windows.Forms.CheckBox();
             this.ViewRotation2Setter = new Pool1984.ValueSetter();
@@ -65,7 +75,9 @@
             this.RenderBox = new Pool1984.ZoomablePictureBox();
             this.CubeMapBox = new Pool1984.ZoomablePictureBox();
             this.rerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SaveRenderingDialog = new System.Windows.Forms.SaveFileDialog();
             this.RightPanel.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -78,6 +90,7 @@
             // RightPanel
             // 
             this.RightPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.RightPanel.Controls.Add(this.groupBox4);
             this.RightPanel.Controls.Add(this.groupBox3);
             this.RightPanel.Controls.Add(this.groupBox2);
             this.RightPanel.Controls.Add(this.groupBox1);
@@ -87,63 +100,186 @@
             this.RightPanel.Size = new System.Drawing.Size(277, 823);
             this.RightPanel.TabIndex = 1;
             // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.SaveRenderingButton);
+            this.groupBox4.Controls.Add(this.RenderButton);
+            this.groupBox4.Location = new System.Drawing.Point(5, 507);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(259, 54);
+            this.groupBox4.TabIndex = 3;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Rendering";
+            // 
+            // SaveRenderingButton
+            // 
+            this.SaveRenderingButton.Location = new System.Drawing.Point(121, 19);
+            this.SaveRenderingButton.Name = "SaveRenderingButton";
+            this.SaveRenderingButton.Size = new System.Drawing.Size(75, 23);
+            this.SaveRenderingButton.TabIndex = 402;
+            this.SaveRenderingButton.Text = "Save...";
+            this.SaveRenderingButton.UseVisualStyleBackColor = true;
+            // 
+            // RenderButton
+            // 
+            this.RenderButton.Location = new System.Drawing.Point(10, 19);
+            this.RenderButton.Name = "RenderButton";
+            this.RenderButton.Size = new System.Drawing.Size(102, 23);
+            this.RenderButton.TabIndex = 401;
+            this.RenderButton.Text = "Render start/stop";
+            this.RenderButton.UseVisualStyleBackColor = true;
+            this.RenderButton.Click += new System.EventHandler(this.RenderButton_Click);
+            // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.timeSetter);
+            this.groupBox3.Controls.Add(this.ViewLightsCheckBox);
             this.groupBox3.Controls.Add(this.ViewColorRefsCheckBox);
+            this.groupBox3.Controls.Add(this.ViewNumbersFlatCheckBox);
+            this.groupBox3.Controls.Add(this.ViewGridCheckBox);
+            this.groupBox3.Controls.Add(this.ViewNumbers3DCheckBox);
+            this.groupBox3.Controls.Add(this.ViewShadowOutlinesCheckBox);
+            this.groupBox3.Controls.Add(this.ViewBoxesCheckbox);
             this.groupBox3.Controls.Add(this.ViewRenderingCheckBox);
-            this.groupBox3.Controls.Add(this.ViewWireframeCheckBox);
-            this.groupBox3.Controls.Add(this.RenderButton);
+            this.groupBox3.Controls.Add(this.ViewBallsCheckBox);
+            this.groupBox3.Controls.Add(this.ViewBallOutlineFlatCheckBox);
             this.groupBox3.Location = new System.Drawing.Point(5, 332);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(259, 215);
+            this.groupBox3.Size = new System.Drawing.Size(259, 169);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Rendering";
+            this.groupBox3.Text = "View options";
+            // 
+            // timeSetter
+            // 
+            this.timeSetter.Dimension = "";
+            this.timeSetter.Label = "Time";
+            this.timeSetter.Location = new System.Drawing.Point(12, 134);
+            this.timeSetter.Max = 1D;
+            this.timeSetter.Min = 0D;
+            this.timeSetter.Name = "timeSetter";
+            this.timeSetter.Size = new System.Drawing.Size(225, 23);
+            this.timeSetter.TabIndex = 340;
+            this.timeSetter.Value = 0D;
+            this.timeSetter.ValueChanged += new System.EventHandler(this.timeSetter_ValueChanged);
+            // 
+            // ViewLightsCheckBox
+            // 
+            this.ViewLightsCheckBox.AutoSize = true;
+            this.ViewLightsCheckBox.Location = new System.Drawing.Point(121, 42);
+            this.ViewLightsCheckBox.Name = "ViewLightsCheckBox";
+            this.ViewLightsCheckBox.Size = new System.Drawing.Size(54, 17);
+            this.ViewLightsCheckBox.TabIndex = 321;
+            this.ViewLightsCheckBox.Text = "Lights";
+            this.ViewLightsCheckBox.UseVisualStyleBackColor = true;
+            this.ViewLightsCheckBox.CheckedChanged += new System.EventHandler(this.ViewOptionsCheckBox_CheckedChanged);
             // 
             // ViewColorRefsCheckBox
             // 
             this.ViewColorRefsCheckBox.AutoSize = true;
-            this.ViewColorRefsCheckBox.Location = new System.Drawing.Point(12, 76);
+            this.ViewColorRefsCheckBox.Location = new System.Drawing.Point(12, 42);
             this.ViewColorRefsCheckBox.Name = "ViewColorRefsCheckBox";
-            this.ViewColorRefsCheckBox.Size = new System.Drawing.Size(96, 17);
-            this.ViewColorRefsCheckBox.TabIndex = 3;
-            this.ViewColorRefsCheckBox.Text = "View Color refs";
+            this.ViewColorRefsCheckBox.Size = new System.Drawing.Size(70, 17);
+            this.ViewColorRefsCheckBox.TabIndex = 302;
+            this.ViewColorRefsCheckBox.Text = "Color refs";
             this.ViewColorRefsCheckBox.UseVisualStyleBackColor = true;
-            this.ViewColorRefsCheckBox.CheckedChanged += new System.EventHandler(this.ViewColorRefsCheckBox_CheckedChanged);
+            this.ViewColorRefsCheckBox.CheckedChanged += new System.EventHandler(this.ViewOptionsCheckBox_CheckedChanged);
+            // 
+            // ViewNumbersFlatCheckBox
+            // 
+            this.ViewNumbersFlatCheckBox.AutoSize = true;
+            this.ViewNumbersFlatCheckBox.Checked = true;
+            this.ViewNumbersFlatCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ViewNumbersFlatCheckBox.Location = new System.Drawing.Point(12, 65);
+            this.ViewNumbersFlatCheckBox.Name = "ViewNumbersFlatCheckBox";
+            this.ViewNumbersFlatCheckBox.Size = new System.Drawing.Size(91, 17);
+            this.ViewNumbersFlatCheckBox.TabIndex = 303;
+            this.ViewNumbersFlatCheckBox.Text = "Numbers (flat)";
+            this.ViewNumbersFlatCheckBox.UseVisualStyleBackColor = true;
+            this.ViewNumbersFlatCheckBox.CheckedChanged += new System.EventHandler(this.ViewOptionsCheckBox_CheckedChanged);
+            // 
+            // ViewGridCheckBox
+            // 
+            this.ViewGridCheckBox.AutoSize = true;
+            this.ViewGridCheckBox.Checked = true;
+            this.ViewGridCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ViewGridCheckBox.Location = new System.Drawing.Point(12, 111);
+            this.ViewGridCheckBox.Name = "ViewGridCheckBox";
+            this.ViewGridCheckBox.Size = new System.Drawing.Size(88, 17);
+            this.ViewGridCheckBox.TabIndex = 305;
+            this.ViewGridCheckBox.Text = "Grid && Border";
+            this.ViewGridCheckBox.UseVisualStyleBackColor = true;
+            this.ViewGridCheckBox.CheckedChanged += new System.EventHandler(this.ViewOptionsCheckBox_CheckedChanged);
+            // 
+            // ViewNumbers3DCheckBox
+            // 
+            this.ViewNumbers3DCheckBox.AutoSize = true;
+            this.ViewNumbers3DCheckBox.Location = new System.Drawing.Point(12, 88);
+            this.ViewNumbers3DCheckBox.Name = "ViewNumbers3DCheckBox";
+            this.ViewNumbers3DCheckBox.Size = new System.Drawing.Size(91, 17);
+            this.ViewNumbers3DCheckBox.TabIndex = 304;
+            this.ViewNumbers3DCheckBox.Text = "Numbers (3D)";
+            this.ViewNumbers3DCheckBox.UseVisualStyleBackColor = true;
+            this.ViewNumbers3DCheckBox.CheckedChanged += new System.EventHandler(this.ViewOptionsCheckBox_CheckedChanged);
+            // 
+            // ViewShadowOutlinesCheckBox
+            // 
+            this.ViewShadowOutlinesCheckBox.AutoSize = true;
+            this.ViewShadowOutlinesCheckBox.Location = new System.Drawing.Point(121, 65);
+            this.ViewShadowOutlinesCheckBox.Name = "ViewShadowOutlinesCheckBox";
+            this.ViewShadowOutlinesCheckBox.Size = new System.Drawing.Size(104, 17);
+            this.ViewShadowOutlinesCheckBox.TabIndex = 322;
+            this.ViewShadowOutlinesCheckBox.Text = "Shadow outlines";
+            this.ViewShadowOutlinesCheckBox.UseVisualStyleBackColor = true;
+            this.ViewShadowOutlinesCheckBox.CheckedChanged += new System.EventHandler(this.ViewOptionsCheckBox_CheckedChanged);
+            // 
+            // ViewBoxesCheckbox
+            // 
+            this.ViewBoxesCheckbox.AutoSize = true;
+            this.ViewBoxesCheckbox.Location = new System.Drawing.Point(121, 111);
+            this.ViewBoxesCheckbox.Name = "ViewBoxesCheckbox";
+            this.ViewBoxesCheckbox.Size = new System.Drawing.Size(55, 17);
+            this.ViewBoxesCheckbox.TabIndex = 324;
+            this.ViewBoxesCheckbox.Text = "Boxes";
+            this.ViewBoxesCheckbox.UseVisualStyleBackColor = true;
+            this.ViewBoxesCheckbox.CheckedChanged += new System.EventHandler(this.ViewOptionsCheckBox_CheckedChanged);
             // 
             // ViewRenderingCheckBox
             // 
             this.ViewRenderingCheckBox.AutoSize = true;
-            this.ViewRenderingCheckBox.Location = new System.Drawing.Point(11, 99);
+            this.ViewRenderingCheckBox.Location = new System.Drawing.Point(121, 88);
             this.ViewRenderingCheckBox.Name = "ViewRenderingCheckBox";
-            this.ViewRenderingCheckBox.Size = new System.Drawing.Size(101, 17);
-            this.ViewRenderingCheckBox.TabIndex = 3;
-            this.ViewRenderingCheckBox.Text = "View Rendering";
+            this.ViewRenderingCheckBox.Size = new System.Drawing.Size(75, 17);
+            this.ViewRenderingCheckBox.TabIndex = 323;
+            this.ViewRenderingCheckBox.Text = "Rendering";
             this.ViewRenderingCheckBox.UseVisualStyleBackColor = true;
-            this.ViewRenderingCheckBox.CheckedChanged += new System.EventHandler(this.ViewRenderingCheckBox_CheckedChanged);
+            this.ViewRenderingCheckBox.CheckedChanged += new System.EventHandler(this.ViewOptionsCheckBox_CheckedChanged);
             // 
-            // ViewWireframeCheckBox
+            // ViewBallsCheckBox
             // 
-            this.ViewWireframeCheckBox.AutoSize = true;
-            this.ViewWireframeCheckBox.Checked = true;
-            this.ViewWireframeCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ViewWireframeCheckBox.Location = new System.Drawing.Point(12, 53);
-            this.ViewWireframeCheckBox.Name = "ViewWireframeCheckBox";
-            this.ViewWireframeCheckBox.Size = new System.Drawing.Size(100, 17);
-            this.ViewWireframeCheckBox.TabIndex = 3;
-            this.ViewWireframeCheckBox.Text = "View Wireframe";
-            this.ViewWireframeCheckBox.UseVisualStyleBackColor = true;
-            this.ViewWireframeCheckBox.CheckedChanged += new System.EventHandler(this.ViewWireframeCheckBox_CheckedChanged);
+            this.ViewBallsCheckBox.AutoSize = true;
+            this.ViewBallsCheckBox.Checked = true;
+            this.ViewBallsCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ViewBallsCheckBox.Location = new System.Drawing.Point(121, 19);
+            this.ViewBallsCheckBox.Name = "ViewBallsCheckBox";
+            this.ViewBallsCheckBox.Size = new System.Drawing.Size(71, 17);
+            this.ViewBallsCheckBox.TabIndex = 320;
+            this.ViewBallsCheckBox.Text = "Balls (3D)";
+            this.ViewBallsCheckBox.UseVisualStyleBackColor = true;
+            this.ViewBallsCheckBox.CheckedChanged += new System.EventHandler(this.ViewOptionsCheckBox_CheckedChanged);
             // 
-            // RenderButton
+            // ViewBallOutlineFlatCheckBox
             // 
-            this.RenderButton.Location = new System.Drawing.Point(6, 19);
-            this.RenderButton.Name = "RenderButton";
-            this.RenderButton.Size = new System.Drawing.Size(75, 23);
-            this.RenderButton.TabIndex = 0;
-            this.RenderButton.Text = "Render";
-            this.RenderButton.UseVisualStyleBackColor = true;
-            this.RenderButton.Click += new System.EventHandler(this.RenderButton_Click);
+            this.ViewBallOutlineFlatCheckBox.AutoSize = true;
+            this.ViewBallOutlineFlatCheckBox.Checked = true;
+            this.ViewBallOutlineFlatCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ViewBallOutlineFlatCheckBox.Location = new System.Drawing.Point(12, 19);
+            this.ViewBallOutlineFlatCheckBox.Name = "ViewBallOutlineFlatCheckBox";
+            this.ViewBallOutlineFlatCheckBox.Size = new System.Drawing.Size(100, 17);
+            this.ViewBallOutlineFlatCheckBox.TabIndex = 301;
+            this.ViewBallOutlineFlatCheckBox.Text = "Ball outline (flat)";
+            this.ViewBallOutlineFlatCheckBox.UseVisualStyleBackColor = true;
+            this.ViewBallOutlineFlatCheckBox.CheckedChanged += new System.EventHandler(this.ViewOptionsCheckBox_CheckedChanged);
             // 
             // groupBox2
             // 
@@ -158,7 +294,7 @@
             this.groupBox2.Size = new System.Drawing.Size(261, 143);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "View";
+            this.groupBox2.Text = "3D View";
             // 
             // ViewEnabledCheckbox
             // 
@@ -166,7 +302,7 @@
             this.ViewEnabledCheckbox.Location = new System.Drawing.Point(14, 23);
             this.ViewEnabledCheckbox.Name = "ViewEnabledCheckbox";
             this.ViewEnabledCheckbox.Size = new System.Drawing.Size(59, 17);
-            this.ViewEnabledCheckbox.TabIndex = 4;
+            this.ViewEnabledCheckbox.TabIndex = 201;
             this.ViewEnabledCheckbox.Text = "Enable";
             this.ViewEnabledCheckbox.UseVisualStyleBackColor = true;
             this.ViewEnabledCheckbox.CheckedChanged += new System.EventHandler(this.ViewEnabledCheckbox_CheckedChanged);
@@ -180,7 +316,7 @@
             this.ViewRotation2Setter.Min = 0D;
             this.ViewRotation2Setter.Name = "ViewRotation2Setter";
             this.ViewRotation2Setter.Size = new System.Drawing.Size(225, 23);
-            this.ViewRotation2Setter.TabIndex = 2;
+            this.ViewRotation2Setter.TabIndex = 204;
             this.ViewRotation2Setter.Value = 4.9968D;
             this.ViewRotation2Setter.ValueChanged += new System.EventHandler(this.ViewSetter_ValueChanged);
             // 
@@ -193,7 +329,7 @@
             this.ViewRotation1Setter.Min = -90D;
             this.ViewRotation1Setter.Name = "ViewRotation1Setter";
             this.ViewRotation1Setter.Size = new System.Drawing.Size(225, 23);
-            this.ViewRotation1Setter.TabIndex = 2;
+            this.ViewRotation1Setter.TabIndex = 203;
             this.ViewRotation1Setter.Value = -30.00074D;
             this.ViewRotation1Setter.ValueChanged += new System.EventHandler(this.ViewSetter_ValueChanged);
             // 
@@ -206,7 +342,7 @@
             this.ViewDistanceSetter.Min = 0.1D;
             this.ViewDistanceSetter.Name = "ViewDistanceSetter";
             this.ViewDistanceSetter.Size = new System.Drawing.Size(225, 23);
-            this.ViewDistanceSetter.TabIndex = 2;
+            this.ViewDistanceSetter.TabIndex = 202;
             this.ViewDistanceSetter.Value = 34.978256D;
             this.ViewDistanceSetter.ValueChanged += new System.EventHandler(this.ViewSetter_ValueChanged);
             // 
@@ -238,7 +374,7 @@
             this.CamRotationSetter.Min = 0D;
             this.CamRotationSetter.Name = "CamRotationSetter";
             this.CamRotationSetter.Size = new System.Drawing.Size(247, 23);
-            this.CamRotationSetter.TabIndex = 1;
+            this.CamRotationSetter.TabIndex = 103;
             this.CamRotationSetter.Value = 34.9992D;
             this.CamRotationSetter.ValueChanged += new System.EventHandler(this.CamRotationSetter_ValueChanged);
             // 
@@ -251,7 +387,7 @@
             this.OffsetYSetter.Min = -2D;
             this.OffsetYSetter.Name = "OffsetYSetter";
             this.OffsetYSetter.Size = new System.Drawing.Size(247, 23);
-            this.OffsetYSetter.TabIndex = 1;
+            this.OffsetYSetter.TabIndex = 102;
             this.OffsetYSetter.Value = -0.00019999999999997797D;
             this.OffsetYSetter.ValueChanged += new System.EventHandler(this.CamRotationSetter_ValueChanged);
             // 
@@ -264,7 +400,7 @@
             this.OffsetXSetter.Min = -2D;
             this.OffsetXSetter.Name = "OffsetXSetter";
             this.OffsetXSetter.Size = new System.Drawing.Size(247, 23);
-            this.OffsetXSetter.TabIndex = 1;
+            this.OffsetXSetter.TabIndex = 101;
             this.OffsetXSetter.Value = -0.0042400000000000215D;
             this.OffsetXSetter.ValueChanged += new System.EventHandler(this.CamRotationSetter_ValueChanged);
             // 
@@ -277,7 +413,7 @@
             this.CamDistSetter.Min = 5D;
             this.CamDistSetter.Name = "CamDistSetter";
             this.CamDistSetter.Size = new System.Drawing.Size(247, 23);
-            this.CamDistSetter.TabIndex = 1;
+            this.CamDistSetter.TabIndex = 100;
             this.CamDistSetter.Value = 5D;
             this.CamDistSetter.ValueChanged += new System.EventHandler(this.CamDistSetter_ValueChanged);
             // 
@@ -324,14 +460,15 @@
             this.cubemapsToolStripMenuItem,
             this.spheremapsToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 75);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 97);
             // 
             // CubeMapContextActiveCubeMap
             // 
+            this.CubeMapContextActiveCubeMap.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.CubeMapContextActiveCubeMap.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CubeMapContextActiveCubeMap.Items.AddRange(new object[] {
             "Ball 1",
-            "Ball 4",
+            "Ball 4a",
             "Ball 8b"});
             this.CubeMapContextActiveCubeMap.Name = "CubeMapContextActiveCubeMap";
             this.CubeMapContextActiveCubeMap.Size = new System.Drawing.Size(121, 23);
@@ -435,6 +572,7 @@
             this.RenderBox.Zoom = 1F;
             this.RenderBox.Paint += new System.Windows.Forms.PaintEventHandler(this.RenderBox_Paint);
             this.RenderBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.RenderBox_MouseClick);
+            this.RenderBox.MouseHover += new System.EventHandler(this.RenderBox_MouseHover);
             // 
             // CubeMapBox
             // 
@@ -451,12 +589,17 @@
             this.CubeMapBox.TabStop = false;
             this.CubeMapBox.Zoom = 0.5F;
             this.CubeMapBox.Paint += new System.Windows.Forms.PaintEventHandler(this.CubeMapBox_Paint);
+            this.CubeMapBox.MouseHover += new System.EventHandler(this.CubeMapBox_MouseHover);
             // 
             // rerToolStripMenuItem
             // 
             this.rerToolStripMenuItem.Name = "rerToolStripMenuItem";
             this.rerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.rerToolStripMenuItem.Text = "rer";
+            // 
+            // SaveRenderingDialog
+            // 
+            this.SaveRenderingDialog.DefaultExt = "png";
             // 
             // Form1
             // 
@@ -469,6 +612,7 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.RightPanel.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -498,7 +642,7 @@
         private System.Windows.Forms.ToolStripComboBox CubeMapContextActiveCubeMap;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Button RenderButton;
-        private System.Windows.Forms.CheckBox ViewWireframeCheckBox;
+        private System.Windows.Forms.CheckBox ViewBallOutlineFlatCheckBox;
         private System.Windows.Forms.CheckBox ViewRenderingCheckBox;
         private System.Windows.Forms.ToolStripMenuItem cubemapsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rerToolStripMenuItem;
@@ -520,6 +664,17 @@
         private ValueSetter ViewDistanceSetter;
         private ValueSetter CamRotationSetter;
         private System.Windows.Forms.CheckBox ViewColorRefsCheckBox;
+        private ValueSetter timeSetter;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.CheckBox ViewLightsCheckBox;
+        private System.Windows.Forms.CheckBox ViewNumbersFlatCheckBox;
+        private System.Windows.Forms.CheckBox ViewNumbers3DCheckBox;
+        private System.Windows.Forms.CheckBox ViewShadowOutlinesCheckBox;
+        private System.Windows.Forms.CheckBox ViewBallsCheckBox;
+        private System.Windows.Forms.Button SaveRenderingButton;
+        private System.Windows.Forms.SaveFileDialog SaveRenderingDialog;
+        private System.Windows.Forms.CheckBox ViewGridCheckBox;
+        private System.Windows.Forms.CheckBox ViewBoxesCheckbox;
     }
 }
 

@@ -9,6 +9,8 @@ namespace Pool1984
 {
     class Number
     {
+        public string Target { get; set; }
+
         public PointF PixelCenter { get; set; }
         public SizeF PixelSize { get; set; }
         public float Degrees { get; set; }

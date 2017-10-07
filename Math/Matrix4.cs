@@ -122,6 +122,14 @@ namespace Pool1984
             });
         }
 
+        public static Matrix4 RotateZYX(Vector3 zyx)
+        {
+            return
+                RotateZ(zyx.Z) *
+                RotateY(zyx.Y) *
+                RotateX(zyx.X);
+        }
+
         public static Matrix4 Translate(Vector3 v)
         {
             return new Matrix4(new[,]

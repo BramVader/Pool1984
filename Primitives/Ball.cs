@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Pool1984
 {
     class Ball : Entity
     {
-        public Vector3 Center { get; set; }
+        public Func<double, Vector3> GetCenter = d => new Vector3();
+        public Func<double, Vector3> GetTextureOrientation = d => new Vector3();
+
         public double Radius { get; set; }
 
         public double MinAngle1 { get; set; }
@@ -16,26 +21,76 @@ namespace Pool1984
 
         public double CubeMapOffset { get; set; }
 
-        // Original bitmap data
-        public PointF PixelCenter { get; set; }
-        public SizeF PixelSize { get; set; }
-        public float Degrees { get; set; }
-        public Bitmap SphereMap { get; set; }
-        public Bitmap CubeMap { get; set; }
-        public Number Number { get; set; }
-        public PointF[][] Boxes { get; set; }
-
-        public Ellipse Ellipse
+        public Matrix4 GetWorldToTexture(double time)
         {
-            get
+            return Matrix4.RotateZYX(GetTextureOrientation(time));
+        }
+
+        private Expression BuildInterpolationExpression(ParameterExpression tpar, Expression prevExpression, double startTime, double endTime, Vector3 startVector, Vector3 endVector)
+        {
+            // (time - startTime) * (endVector - startVector)
+            Expression exprA =
+                Expression.Multiply(
+                    startTime > 0.0 ?
+                        Expression.Subtract(tpar, Expression.Constant(startTime)) :
+                        (Expression)tpar,
+                    Expression.Constant(endVector - startVector)
+                );
+
+            // startVector + (time - startTime) * (endVector - startVector) / (endTime - startTime)
+            Expression exprB =
+                Expression.Add(
+                        Expression.Constant(startVector),
+                        endTime - startTime < 1.0 ?
+                            Expression.Divide(
+                                exprA,
+                                Expression.Constant(endTime - startTime)
+                            ) :
+                            exprA
+                    );
+
+            // time < endTime ? 
+            //    startVector + (time - startTime) * (endVector - startVector) / (endTime - startTime) :
+            //    endTime
+            Expression exprC = endTime < 1.0 ?
+                    Expression.Condition(
+                        Expression.LessThan(tpar, Expression.Constant(endTime)),
+                        exprB,
+                        Expression.Constant(endVector)
+                    ) :
+                    exprB;
+
+            // time < starTime ?
+            //    {prevExpression} ?? startVector :
+            //    time < endTime ? 
+            //       startVector + (time - startTime) * (endVector - startVector) / (endTime - startTime) :
+            //       endTime
+            return
+                startTime > 0.0 ?
+                Expression.Condition(
+                    Expression.LessThan(tpar, Expression.Constant(startTime)),
+                    prevExpression ?? Expression.Constant(startVector),
+                    exprC
+                ) :
+                exprC;
+        }
+
+        public void ApplyKeyframes(IEnumerable<Keyframe> frames)
+        {
+            ParameterExpression tpar = Expression.Parameter(typeof(double), "t");
+
+            Expression centerExpr = null;
+            Expression rotationExpr = null;
+            foreach (var keyframe in frames.Where(it => it.StartPosition.Ball == this).OrderBy(it => it.StartTime))
             {
-                return new Ellipse
-                {
-                    PixelCenter = this.PixelCenter,
-                    PixelSize = this.PixelSize,
-                    Degrees = this.Degrees
-                };
+                // Interpolating position.Center over time
+                centerExpr = BuildInterpolationExpression(tpar, centerExpr, keyframe.StartTime, keyframe.EndTime, keyframe.StartPosition.Center, keyframe.EndPosition.Center);
+
+                // Interpolating textureOrientation over time
+                rotationExpr = BuildInterpolationExpression(tpar, rotationExpr, keyframe.StartTime, keyframe.EndTime, keyframe.StartPosition.TextureOrientation, keyframe.EndPosition.TextureOrientation);
             }
+            GetCenter = Expression.Lambda<Func<double, Vector3>>(centerExpr, tpar).Compile();
+            GetTextureOrientation = Expression.Lambda<Func<double, Vector3>>(rotationExpr, tpar).Compile();
         }
 
         public Ball()
@@ -43,12 +98,22 @@ namespace Pool1984
             Radius = 1.0;
         }
 
-        public override Intersection GetClosestIntersection(Ray ray, IntersectionMode mode, double minDist = Intersection.MinDistance, double maxDist = Intersection.MaxDistance)
+        public Intersection GetClosestIntersection(Ray ray, IntersectionMode mode, BallPosition position, double minDist = Intersection.MinDistance, double maxDist = Intersection.MaxDistance)
+        {
+            return GetClosestIntersection(ray, mode, position.Center, minDist, maxDist);
+        }
+
+        public override Intersection GetClosestIntersection(Ray ray, IntersectionMode mode, double time, double minDist = Intersection.MinDistance, double maxDist = Intersection.MaxDistance)
+        {
+            return GetClosestIntersection(ray, mode, GetCenter(time), minDist, maxDist);
+        }
+
+        private Intersection GetClosestIntersection(Ray ray, IntersectionMode mode, Vector3 center, double minDist = Intersection.MinDistance, double maxDist = Intersection.MaxDistance)
         {
             Intersection intsec = new Intersection() { Entity = this };
 
             // Calculate intersection with ball
-            Vector3 ct = ray.Origin - Center;
+            Vector3 ct = ray.Origin - center;
             double b = 2.0 * Vector3.Dot(ray.Direction, ct);
             double c = Vector3.Dot(ct, ct) - Radius * Radius;
             double d = b * b - 4.0 * c;
@@ -60,15 +125,15 @@ namespace Pool1984
                 {
                     // Calculate intersection
                     intsec.Position = ray.Origin + intsec.Distance * ray.Direction;
-                    intsec.Normal = (intsec.Position - Center) / Radius;
+                    intsec.Normal = (intsec.Position - center) / Radius;
                 }
             }
             return intsec;
         }
 
-        public override Vector3 TransformNormal(Vector3 normal)
+        public override Vector3 TransformNormal(Vector3 normal, double time)
         {
-            return normal * WorldToTexture;
+            return normal * GetWorldToTexture(time);
         }
 
         public override Vector2 GetTextureCoordinates(Vector3 transformedNormal)
