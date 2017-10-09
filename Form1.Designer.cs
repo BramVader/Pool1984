@@ -161,7 +161,7 @@
             this.timeSetter.Size = new System.Drawing.Size(225, 23);
             this.timeSetter.TabIndex = 340;
             this.timeSetter.Value = 0D;
-            this.timeSetter.ValueChanged += new System.EventHandler(this.timeSetter_ValueChanged);
+            this.timeSetter.ValueChanged += new System.EventHandler(this.TimeSetter_ValueChanged);
             // 
             // ViewLightsCheckBox
             // 
@@ -214,6 +214,8 @@
             // ViewNumbers3DCheckBox
             // 
             this.ViewNumbers3DCheckBox.AutoSize = true;
+            this.ViewNumbers3DCheckBox.Checked = true;
+            this.ViewNumbers3DCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ViewNumbers3DCheckBox.Location = new System.Drawing.Point(12, 88);
             this.ViewNumbers3DCheckBox.Name = "ViewNumbers3DCheckBox";
             this.ViewNumbers3DCheckBox.Size = new System.Drawing.Size(91, 17);
@@ -460,7 +462,7 @@
             this.cubemapsToolStripMenuItem,
             this.spheremapsToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 97);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 75);
             // 
             // CubeMapContextActiveCubeMap
             // 

@@ -16,9 +16,12 @@ namespace Pool1984
         {
         }
 
+        public abstract Matrix4 GetWorldToTexture(double time);
+
+        public abstract Matrix4 GetTextureToWorld(double time);
+
         public abstract Intersection GetClosestIntersection(Ray ray, IntersectionMode mode, double time, double minDist = Intersection.MinDistance, double maxDist = Intersection.MaxDistance);
 
-        public abstract Vector3 TransformNormal(Vector3 normal, double time);
         public abstract Vector2 GetTextureCoordinates(Vector3 transformedNormal);
     }
 }

@@ -21,9 +21,14 @@ namespace Pool1984
 
         public double CubeMapOffset { get; set; }
 
-        public Matrix4 GetWorldToTexture(double time)
+        public override Matrix4 GetWorldToTexture(double time)
         {
-            return Matrix4.RotateZYX(GetTextureOrientation(time));
+            return Matrix4.Rotate(GetTextureOrientation(time));
+        }
+
+        public override Matrix4 GetTextureToWorld(double time)
+        {
+            return Matrix4.RotateInv(GetTextureOrientation(time));
         }
 
         private Expression BuildInterpolationExpression(ParameterExpression tpar, Expression prevExpression, double startTime, double endTime, Vector3 startVector, Vector3 endVector)
@@ -129,11 +134,6 @@ namespace Pool1984
                 }
             }
             return intsec;
-        }
-
-        public override Vector3 TransformNormal(Vector3 normal, double time)
-        {
-            return normal * GetWorldToTexture(time);
         }
 
         public override Vector2 GetTextureCoordinates(Vector3 transformedNormal)

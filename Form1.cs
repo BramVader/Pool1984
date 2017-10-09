@@ -83,8 +83,8 @@ namespace Pool1984
             {
                 Spots = new Light.Spot[]
                 {
-                    new Light.Spot { Target = "Ball 1", PixelCenter = new PointF(78.7676348023617f, 197.045802607026f), PixelSize1 = new SizeF(3.75987462459764f, 5.14884893927504f), PixelSize2 = new SizeF(6.62400107264758f, 9.12188718706622f), Degrees = 40f },
-                    new Light.Spot { Target = "Ball 4a", PixelCenter = new PointF(645.372198995559f, 151.289343091178f), PixelSize1 = new SizeF(4.38803220663234f, 5.85486448787416f), PixelSize2 = new SizeF(6.98456806016931f, 8.64037551205804f), Degrees = 60f },
+                    new Light.Spot { Target = "Ball 1", PixelCenter = new PointF(78.76f, 197.04f), PixelSize1 = new SizeF(3.75f, 5.14f), PixelSize2 = new SizeF(6.62f, 9.12f), Degrees = 40f },
+                    new Light.Spot { Target = "Ball 4a", PixelCenter = new PointF(645.37f, 151.28f), PixelSize1 = new SizeF(4.38f, 5.85f), PixelSize2 = new SizeF(6.98f, 8.64f), Degrees = 60f },
                 }
             },
 
@@ -92,8 +92,8 @@ namespace Pool1984
             {
                 Spots = new Light.Spot[]
                 {
-                    new Light.Spot { Target = "Ball 1", PixelCenter = new PointF(89.3994475476303f, 168.448015409621f), PixelSize1 = new SizeF(11.1730411793682f, 10.7433040518897f), PixelSize2 = new SizeF(13.9683802147044f, 13.8644370285125f), Degrees = 60f },
-                    new Light.Spot { Target = "Ball 4a", PixelCenter = new PointF(655.591287264545f, 125.473287391466f), PixelSize1 = new SizeF(10.0267102850775f, 9.31539894342744f), PixelSize2 = new SizeF(12.8326319992927f, 12.1194296474193f), Degrees = 62.1f },
+                    new Light.Spot { Target = "Ball 1", PixelCenter = new PointF(89.39f, 168.44f), PixelSize1 = new SizeF(11.17f, 10.74f), PixelSize2 = new SizeF(13.96f, 13.86f), Degrees = 60f },
+                    new Light.Spot { Target = "Ball 4a", PixelCenter = new PointF(655.59f, 125.47f), PixelSize1 = new SizeF(10.02f, 9.31f), PixelSize2 = new SizeF(12.83f, 12.11f), Degrees = 62.1f },
                 }
             },
 
@@ -101,8 +101,8 @@ namespace Pool1984
             {
                 Spots = new Light.Spot[]
                 {
-                    new Light.Spot { Target = "Ball 1", PixelCenter = new PointF(120.313342317405f, 129.814829472171f), PixelSize1 = new SizeF(7.31716653922499f, 8.84106836875298f), PixelSize2 = new SizeF(9.9715291737796f, 11.56346130053f), Degrees = 75f },
-                    new Light.Spot { Target = "Ball 4a", PixelCenter = new PointF(683.08659880357f, 85.4726687694167f), PixelSize1 = new SizeF(8.2223635362004f, 10.2194616801775f), PixelSize2 = new SizeF(10.3714032542806f, 12.3594295796251f), Degrees = 80f },
+                    new Light.Spot { Target = "Ball 1", PixelCenter = new PointF(120.31f, 129.81f), PixelSize1 = new SizeF(7.31f, 8.84f), PixelSize2 = new SizeF(9.97f, 11.56f), Degrees = 75f },
+                    new Light.Spot { Target = "Ball 4a", PixelCenter = new PointF(683.08f, 85.47f), PixelSize1 = new SizeF(8.22f, 10.21f), PixelSize2 = new SizeF(10.37f, 12.35f), Degrees = 80f },
                 }
             }
         };
@@ -130,7 +130,7 @@ namespace Pool1984
         // the room are motion blurred, as are the penumbras.
         private static Keyframe[] keyframes = new Keyframe[] {
             new Keyframe { StartPosition = positions["Ball 1"], EndPosition = positions["Ball 1"], StartTime = 0.0, EndTime = 1.0 },
-            new Keyframe { StartPosition = positions["Ball 4a"], EndPosition = positions["Ball 4b"], StartTime = 0.8, EndTime = 1.0 },
+            new Keyframe { StartPosition = positions["Ball 4a"], EndPosition = positions["Ball 4b"], StartTime = 0.5, EndTime = 1.0 },
             new Keyframe { StartPosition = positions["Ball 8a"], EndPosition = positions["Ball 8b"], StartTime = 0.4, EndTime = 0.6 },
             new Keyframe { StartPosition = positions["Ball 9c"], EndPosition = positions["Ball 9b"], StartTime = 0.0, EndTime = 0.4 },
             new Keyframe { StartPosition = positions["Ball 9b"], EndPosition = positions["Ball 9a"], StartTime = 0.6, EndTime = 1.0 },
@@ -141,7 +141,6 @@ namespace Pool1984
         private Bitmap pictureDetail;
 
         private Bitmap renderBitmap;
-        private Bitmap previewBitmap;
         private Bitmap cubeMap;
 
         private Camera camera;
@@ -151,7 +150,6 @@ namespace Pool1984
         private Vector3[] pictureRect = new Vector3[4];
         private float pictureScale = 1f;
         private float pictureWidth, pictureHeight;
-        private RectangleF previewRect = new RectangleF(523f, 56f, 96f, 77f);
 
         private RectangleF pictureDetailRect = new RectangleF(650f, 56f, 96f, 77f);
 
@@ -698,7 +696,7 @@ namespace Pool1984
                                 Math.Cos(angle1) * Math.Cos(angle2),
                                 Math.Sin(angle1) * Math.Cos(angle2),
                                 Math.Sin(angle2));
-                            v = ball.TransformNormal(v, time) + ball.GetCenter(time);
+                            v = v * ball.GetTextureToWorld(time) + ball.GetCenter(time);
                             PointF pp2 = CoordToPixel(renderCamera.VertexToCoord(v));
                             if (n > 0)
                                 e.Graphics.DrawLine(pens[4], pp1, pp2);
@@ -1048,14 +1046,16 @@ namespace Pool1984
 
                     // Calculate transformation matrix of texture
                     // - Rotation about Z and Y axes
-                    Vector3 textureOrientation = new Vector3();
-                    textureOrientation.Z = -Math.Atan2(center.Y, center.X);
+                    Vector3 textureOrientation = new Vector3
+                    {
+                        Z = -Math.Atan2(center.Y, center.X)
+                    };
                     var rot = Matrix4.RotateZ(textureOrientation.Z);
                     var v1 = center * rot;
                     textureOrientation.Y = Math.Atan2(v1.Z, v1.X);
                     rot = rot * Matrix4.RotateY(textureOrientation.Y);
 
-                    // - Orientation of the texture by using the captured OrientStart and OrientEnd
+                    // -Orientation of the texture by using the captured OrientStart and OrientEnd
                     Ray rayStart = camera.CoordToRay(PixelToCoord(number.OrientStart));
                     var intsecStart = position.GetClosestIntersection(rayStart, IntersectionMode.PositionAndNormal);
                     Ray rayEnd = camera.CoordToRay(PixelToCoord(number.OrientEnd));
@@ -1065,7 +1065,7 @@ namespace Pool1984
 
                     // - World <-> Texture transformation matrices
                     position.TextureOrientation = textureOrientation;
-                    position.WorldToTexture = rot * Matrix4.RotateX(textureOrientation.X);
+                    position.WorldToTexture = Matrix4.Rotate(textureOrientation);
                     position.TextureToWorld = Matrix4.AffineInvert(position.WorldToTexture);
 
                     // Calculate angle range of texture
@@ -1198,10 +1198,6 @@ namespace Pool1984
                 colorRef.Measured = sum / count;
             }
             picture.UnlockBits(bmpDataRead);
-
-            // Override these values, because we're using the high resolution inset which is not color accurate
-            colorRefs[6].Measured = new Color3(0.51963661140131789, 0.24298281474752118, 0.501691271103037);
-            colorRefs[8].Measured = new Color3(0.45770615095353273, 0.29091950935625455, 0.47271913331542786);
         }
 
         // Cube maps
@@ -1218,10 +1214,8 @@ namespace Pool1984
                     var bmpDataWrite = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
                     // Reading from original picture
                     var bmpDataReadOriginal = picture.LockBits(new Rectangle(0, 0, picture.Width, picture.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-                    // Reading from rendered picture
+                    // Reading from original detail picture
                     var bmpDataReadOriginalDetail = pictureDetail.LockBits(new Rectangle(0, 0, pictureDetail.Width, pictureDetail.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
-                    // Reading from rendered picture
-                    var bmpDataReadRendered = renderBitmap.LockBits(new Rectangle(0, 0, renderBitmap.Width, renderBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
 
                     // Find the graphical box containing the sphere
                     double minx = 1E12, maxx = -1E12, miny = 1E12, maxy = -1E12;
@@ -1285,24 +1279,17 @@ namespace Pool1984
                                             // Reading from original picture
                                             adrReadOriginal = (byte*)(bmpDataReadOriginal.Scan0 + (int)(pixelCoord.Y * pictureScale) * bmpDataReadOriginal.Stride + (int)(pixelCoord.X * pictureScale) * 3);
                                         }
-                                        // Reading from rendered picture
-                                        byte* adrReadRendered = (byte*)(bmpDataReadRendered.Scan0 + (int)pixelCoord.Y * bmpDataReadRendered.Stride + (int)pixelCoord.X * 3);
                                         // Writing to cube map
                                         byte* adrWrite = (byte*)(bmpDataWrite.Scan0 + (int)p.Y * bmpDataWrite.Stride + ((int)p.X + planeOffset) * 3);
 
-                                        int b1 = (*adrReadOriginal++ - *adrReadRendered++).Limit(0, 255);
-                                        int g1 = (*adrReadOriginal++ - *adrReadRendered++).Limit(0, 255);
-                                        int r1 = (*adrReadOriginal++ - *adrReadRendered++).Limit(0, 255);
-
-                                        *adrWrite++ = (byte)b1;
-                                        *adrWrite++ = (byte)g1;
-                                        *adrWrite++ = (byte)r1;
+                                        *adrWrite++ = *adrReadOriginal++;
+                                        *adrWrite++ = *adrReadOriginal++;
+                                        *adrWrite++ = *adrReadOriginal++;
                                     }
                                 }
                             }
                         }
 
-                    renderBitmap.UnlockBits(bmpDataReadRendered);
                     picture.UnlockBits(bmpDataReadOriginal);
                     pictureDetail.UnlockBits(bmpDataReadOriginalDetail);
                     bmp.UnlockBits(bmpDataWrite);
@@ -1376,7 +1363,7 @@ namespace Pool1984
             RenderBox.Invalidate();
         }
 
-        private void timeSetter_ValueChanged(object sender, EventArgs e)
+        private void TimeSetter_ValueChanged(object sender, EventArgs e)
         {
             RenderBox.Invalidate();
         }
@@ -1562,7 +1549,7 @@ namespace Pool1984
                 // Get texture
                 if (entity.Texture != null)
                 {
-                    Vector3 transformedNormal = entity.TransformNormal(closest.Normal, time);
+                    Vector3 transformedNormal = closest.Normal * entity.GetWorldToTexture(time);
                     Vector2 p = entity.GetTextureCoordinates(transformedNormal);
                     if (p.Length < 1.0)
                     {

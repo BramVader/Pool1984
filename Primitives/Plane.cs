@@ -34,12 +34,17 @@ namespace Pool1984
             return intsec;
         }
 
-        public override Vector3 TransformNormal(Vector3 normal, double time)
+        public override Vector2 GetTextureCoordinates(Vector3 transformedNormal)
         {
             throw new NotImplementedException();
         }
 
-        public override Vector2 GetTextureCoordinates(Vector3 transformedNormal)
+        public override Matrix4 GetWorldToTexture(double time)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Matrix4 GetTextureToWorld(double time)
         {
             throw new NotImplementedException();
         }
