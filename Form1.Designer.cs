@@ -119,6 +119,7 @@
             this.SaveRenderingButton.TabIndex = 402;
             this.SaveRenderingButton.Text = "Save...";
             this.SaveRenderingButton.UseVisualStyleBackColor = true;
+            this.SaveRenderingButton.Click += new System.EventHandler(this.SaveRenderingButton_Click);
             // 
             // RenderButton
             // 
@@ -602,6 +603,7 @@
             // SaveRenderingDialog
             // 
             this.SaveRenderingDialog.DefaultExt = "png";
+            this.SaveRenderingDialog.Filter = "PNG-files|*.png";
             // 
             // Form1
             // 

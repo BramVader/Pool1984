@@ -11,7 +11,7 @@ namespace Pool1984
         public const double MinDistance = 1E-5;
         public const double MaxDistance = 1E12;
 
-        public Entity Entity { get; set; }
+        public Primitive Entity { get; set; }
 
         public bool Hit { get; set; }
         public double Distance { get; set; }

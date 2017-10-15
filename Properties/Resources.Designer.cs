@@ -63,16 +63,6 @@ namespace Pool1984.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Ball_texture {
-            get {
-                object obj = ResourceManager.GetObject("Ball texture", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap Ball_texture_2 {
             get {
                 object obj = ResourceManager.GetObject("Ball texture 2", resourceCulture);
@@ -93,9 +83,9 @@ namespace Pool1984.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Cubemap {
+        internal static System.Drawing.Bitmap Cloth {
             get {
-                object obj = ResourceManager.GetObject("Cubemap", resourceCulture);
+                object obj = ResourceManager.GetObject("Cloth", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,9 +93,9 @@ namespace Pool1984.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Cubemap_small {
+        internal static System.Drawing.Bitmap Cubemap {
             get {
-                object obj = ResourceManager.GetObject("Cubemap_small", resourceCulture);
+                object obj = ResourceManager.GetObject("Cubemap", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

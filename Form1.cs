@@ -7,26 +7,25 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
+using Pool1984.Properties;
+using System.IO;
 
 namespace Pool1984
 {
     public partial class Form1 : Form
     {
         private static int textureSize = 512;
-        private static int cubeTextureSize = 512;
-        private Color3 ambientColor = Color3.FromColor(Color.FromArgb(20, 20, 20));
-        private Color3 numberTextureBlackColor = Color3.FromColor(Color.Black);
-        private Color3 numberTextureWhiteColor = Color3.FromColor(Color.Ivory);
-        private double reflection = 0.2;
+        private double ambient = 0.01;
+        private double reflection = 0.3;
 
-        private int nrSamplesX = 8;
-        private int nrSamplesY = 8;
+        private int nrSamplesX = 6;
+        private int nrSamplesY = 6;
 
         private static Number[] numbers = new Number[]
         {
             new Number { Target = "Ball 1", PixelCenter = new PointF(124.72f, 175.53f), PixelSize = new SizeF(90.68f, 95.44f), Degrees = -24.00f, OrientStart = new PointF(127.38f, 201.46f), OrientEnd = new PointF(138.72f, 156.11f) },
             new Number { Target = "Ball 4a", PixelCenter = new PointF(641.06f, 154.74f), PixelSize = new SizeF(74.17f, 93.62f), Degrees = 41.30f, OrientStart = new PointF(653.94f, 144.58f), OrientEnd = new PointF(644.95f, 184.83f) },
-            new Number { Target = "Ball 4b", PixelCenter = new PointF(669.97f, 139.25f), PixelSize = new SizeF(74.17f, 93.62f), Degrees = 41.30f, OrientStart = new PointF(653.94f, 144.58f), OrientEnd = new PointF(644.95f, 184.83f) },
+            new Number { Target = "Ball 4b", PixelCenter = new PointF(665.06f, 142.90f), PixelSize = new SizeF(81.02f, 93.51f), Degrees = 28.00f, OrientStart = new PointF(653.94f, 144.58f), OrientEnd = new PointF(644.95f, 184.83f) },
             new Number { Target = "Ball 8a", PixelCenter = new PointF(520.97f, 181.08f), PixelSize = new SizeF(98.21f, 93.10f), Degrees = 96.00f, OrientStart = new PointF(534.89f, 163.29f), OrientEnd = new PointF(510.13f, 199.19f) },
             new Number { Target = "Ball 8b", PixelCenter = new PointF(486.89f, 205.26f), PixelSize = new SizeF(92.53f, 94.44f), Degrees = -4.80f, OrientStart = new PointF(682.86f, 189.74f), OrientEnd = new PointF(673.86f, 169.34f) },
             new Number { Target = "Ball 9a", PixelCenter = new PointF(288.97f, 209.33f), PixelSize = new SizeF(90.71f, 57.60f), Degrees = 41.00f, OrientStart = new PointF(282.61f, 189.37f), OrientEnd = new PointF(302.26f, 220.74f) },
@@ -65,16 +64,16 @@ namespace Pool1984
 
         private static Dictionary<string, BallPosition> positions = new[]
         {
-            new BallPosition { Name = "Ball 1",  Target = "Ball 1", PixelCenter = new PointF(111.78f, 166.22f), PixelSize = new SizeF(175.02f, 176.32f), Degrees = -179.50f },
+            new BallPosition { Name = "Ball 1", Target = "Ball 1", PixelCenter = new PointF(111.78f, 166.22f), PixelSize = new SizeF(175.02f, 176.32f), Degrees = -179.50f },
             new BallPosition { Name = "Ball 9a", Target = "Ball 9", PixelCenter = new PointF(326.64f, 247.57f), PixelSize = new SizeF(173.11f, 176.89f), Degrees = -179.50f },
             new BallPosition { Name = "Ball 9b", Target = "Ball 9", PixelCenter = new PointF(337.32f, 267.88f), PixelSize = new SizeF(173.11f, 176.89f), Degrees = -179.50f },
             new BallPosition { Name = "Ball 9c", Target = "Ball 9", PixelCenter = new PointF(340.62f, 297.17f), PixelSize = new SizeF(173.11f, 176.89f), Degrees = -179.50f },
             new BallPosition { Name = "Ball 8a", Target = "Ball 8", PixelCenter = new PointF(513.15f, 187.86f), PixelSize = new SizeF(171.81f, 176.67f), Degrees = 167.00f },
             new BallPosition { Name = "Ball 8b", Target = "Ball 8", PixelCenter = new PointF(495.39f, 193.06f), PixelSize = new SizeF(171.81f, 176.67f), Degrees = 167.00f },
-            new BallPosition { Name = "Ball 4a", Target = "Ball 4", PixelCenter = new PointF(675.32f, 122.76f), PixelSize = new SizeF(171.81f, 176.67f), Degrees = -179.70f },
-            new BallPosition { Name = "Ball 4b", Target = "Ball 4", PixelCenter = new PointF(704.06f, 107.31f), PixelSize = new SizeF(171.81f, 176.67f), Degrees = -179.70f },
+            new BallPosition { Name = "Ball 4a", Target = "Ball 4", PixelCenter = new PointF(676.31f, 123.41f), PixelSize = new SizeF(172.73f, 175.75f), Degrees = -179.70f },
+            new BallPosition { Name = "Ball 4b", Target = "Ball 4", PixelCenter = new PointF(689.79f, 118.62f), PixelSize = new SizeF(172.73f, 175.75f), Degrees = -179.70f },
             new BallPosition { Name = "Ball wa", Target = "Ball w", PixelCenter = new PointF(295.17f, 550.50f), PixelSize = new SizeF(177.64f, 177.64f), Degrees = 0.00f },
-            new BallPosition { Name = "Ball wb", Target = "Ball w", PixelCenter = new PointF(287.61f, 548.14f), PixelSize = new SizeF(177.64f, 177.64f), Degrees = 0.00f }
+            new BallPosition { Name = "Ball wb", Target = "Ball w", PixelCenter = new PointF(287.61f, 548.14f), PixelSize = new SizeF(177.64f, 177.64f), Degrees = 0.00f },
         }.ToDictionary(it => it.Name);
 
         private static Light[] lights = new Light[]
@@ -124,28 +123,28 @@ namespace Pool1984
 
         // From the paper:
         // Notice that the motion is not linear: the 9 ball changes direction abruptly in the middle of the
-        // frame, the 8 ball moves only during the middle of the frame, and the, l ball only starts to move 
-        // near the end of the frame.The shadows on the table are sharper where the balls are closer to the 
-        // table; this most apparent in the stationary 1 ball.The reflections of the billiard balls and
+        // frame, the 8 ball moves only during the middle of the frame, and the 4 ball only starts to move 
+        // near the end of the frame. The shadows on the table are sharper where the balls are closer to the 
+        // table; this most apparent in the stationary 1 ball. The reflections of the billiard balls and
         // the room are motion blurred, as are the penumbras.
         private static Keyframe[] keyframes = new Keyframe[] {
             new Keyframe { StartPosition = positions["Ball 1"], EndPosition = positions["Ball 1"], StartTime = 0.0, EndTime = 1.0 },
             new Keyframe { StartPosition = positions["Ball 4a"], EndPosition = positions["Ball 4b"], StartTime = 0.5, EndTime = 1.0 },
-            new Keyframe { StartPosition = positions["Ball 8a"], EndPosition = positions["Ball 8b"], StartTime = 0.4, EndTime = 0.6 },
-            new Keyframe { StartPosition = positions["Ball 9c"], EndPosition = positions["Ball 9b"], StartTime = 0.0, EndTime = 0.4 },
-            new Keyframe { StartPosition = positions["Ball 9b"], EndPosition = positions["Ball 9a"], StartTime = 0.6, EndTime = 1.0 },
-            new Keyframe { StartPosition = positions["Ball wa"], EndPosition = positions["Ball wb"], StartTime = 0.4, EndTime = 0.7 }
+            new Keyframe { StartPosition = positions["Ball 8b"], EndPosition = positions["Ball 8a"], StartTime = 0.4, EndTime = 0.6 },
+            new Keyframe { StartPosition = positions["Ball 9c"], EndPosition = positions["Ball 9b"], StartTime = 0.0, EndTime = 0.5 },
+            new Keyframe { StartPosition = positions["Ball 9b"], EndPosition = positions["Ball 9a"], StartTime = 0.5, EndTime = 1.0 },
+            new Keyframe { StartPosition = positions["Ball wa"], EndPosition = positions["Ball wb"], StartTime = 0.0, EndTime = 1.0 }
         };
 
         private Bitmap picture;
         private Bitmap pictureDetail;
 
         private Bitmap renderBitmap;
-        private Bitmap cubeMap;
+        private CubeTexture cubeMap;
 
-        private Camera camera;
+        private Model model;
         private Camera viewCamera;
-        private Dictionary<string, Entity> entities;
+        private Dictionary<string, Primitive> primitives;
 
         private Vector3[] pictureRect = new Vector3[4];
         private float pictureScale = 1f;
@@ -153,14 +152,9 @@ namespace Pool1984
 
         private RectangleF pictureDetailRect = new RectangleF(650f, 56f, 96f, 77f);
 
-        private Bitmap UnpackTexture(int offset)
+        private Texture UnpackTexture(int offset)
         {
-            var bitmap = new Bitmap(textureSize, textureSize, PixelFormat.Format24bppRgb);
-            using (Graphics g = Graphics.FromImage(bitmap))
-            {
-                g.DrawImage(CubeMapBox.Image, new Point(-offset * textureSize, 0));
-            }
-            return bitmap;
+            return Texture.FromBitmap((Bitmap)CubeMapBox.Image, new Rectangle(offset * textureSize, 0, textureSize, textureSize));
         }
 
         public Form1()
@@ -172,61 +166,59 @@ namespace Pool1984
             pictureHeight = picture.Height / pictureScale;
 
             pictureDetail = RenderBox.ErrorImage as Bitmap;
-            cubeMap = CubeMapBox.ErrorImage as Bitmap;
-
-            MeasureColorRefs();
-            double ambient = Math.Min(Math.Min(
-                colorRefs[1].Measured.R,
-                colorRefs[1].Measured.G),
-                colorRefs[1].Measured.B
-            );
-            ambient = 0.01;
-            ambientColor = new Color3(ambient, ambient, ambient);
+            cubeMap = CubeTexture.FromBitmap(CubeMapBox.ErrorImage as Bitmap);
 
             CubeMapContextActiveCubeMap.SelectedIndex = 0;
 
-            entities = new Entity[]
+            MeasureColorRefs();
+            primitives = new Primitive[]
             {
                 new Ball
                 {
                     Name = "Ball 1",
-                    DiffuseColor = colorRefs[5].Measured - ambientColor,
-                    BandColor = colorRefs[5].Measured - ambientColor,
-                    Texture = UnpackTexture(0)
+                    DiffuseColor = colorRefs[5].Measured,
+                    BandColor = colorRefs[5].Measured,
+                    Texture = UnpackTexture(0),
+                    Reflection = reflection
                 },
                 new Ball
                 {
                     Name = "Ball 9",
                     DiffuseColor = Color3.FromColor(Color.FromArgb(234, 246, 163)),
-                    BandColor = colorRefs[5].Measured - ambientColor,
-                    Texture = UnpackTexture(3)
+                    BandColor = colorRefs[5].Measured,
+                    Texture = UnpackTexture(3),
+                    Reflection = reflection
                 },
                 new Ball
                 {
                     Name = "Ball 8",
                     DiffuseColor = Color3.FromColor(Color.Black),
                     BandColor = Color3.FromColor(Color.Black),
-                    Texture = UnpackTexture(2)
+                    Texture = UnpackTexture(2),
+                    Reflection = reflection
                 },
                 new Ball
                 {
                     Name = "Ball 4",
-                    DiffuseColor = colorRefs[6].Measured - ambientColor,
-                    BandColor = colorRefs[6].Measured - ambientColor,
-                    Texture = UnpackTexture(1)
+                    DiffuseColor = colorRefs[6].Measured,
+                    BandColor = colorRefs[6].Measured,
+                    Texture = UnpackTexture(1),
+                    Reflection = reflection
                 },
                 new Ball
                 {
                     Name = "Ball w",
                     DiffuseColor = Color3.FromColor(Color.FromArgb(234, 246, 163)),
-                    BandColor = Color3.FromColor(Color.FromArgb(234, 246, 163))
+                    BandColor = Color3.FromColor(Color.FromArgb(234, 246, 163)),
+                    Reflection = reflection
                 },
                 new Plane
                 {
                     Name = "Felt",
                     Center = new Vector3(0.0, 0.0, 0.0),
                     Normal = new Vector3(0.0, 0.0, 1.0),
-                    DiffuseColor = colorRefs[0].Measured - ambientColor
+                    DiffuseColor = colorRefs[0].Measured,
+                    Texture = Texture.FromBitmap(Resources.Cloth)
                 }
             }.ToDictionary(it => it.Name);
 
@@ -238,7 +230,7 @@ namespace Pool1984
 
             foreach (var position in positions.Values)
             {
-                position.Ball = entities[position.Target] as Ball;
+                position.Ball = primitives[position.Target] as Ball;
             }
 
             // For obtaining original cube map texture
@@ -258,9 +250,15 @@ namespace Pool1984
             CubeMapBox.Image = null;
             CubeMapBox.ErrorImage = null;
 
-            this.MouseWheel += Form1_MouseWheel;
-            this.camera = new Camera() { ApertureH = 7.4, ApertureV = 6.3 };
-            this.viewCamera = this.camera.Clone();
+            this.model = new Model
+            {
+                Camera = new Camera() { ApertureH = 7.4, ApertureV = 6.3 },
+                CubeMap = cubeMap,
+                AmbientColor = new Color3(ambient, ambient, ambient),
+                Primitives = primitives.Values,
+                Lights = lights
+            };
+            this.viewCamera = model.Camera.Clone();
 
             OffsetXSetter.Value = 0.0;
             OffsetYSetter.Value = 0.0;
@@ -272,6 +270,8 @@ namespace Pool1984
             ViewDistanceSetter.Value = 600.0;
 
             CalcScene();
+
+            this.MouseWheel += Form1_MouseWheel;
         }
 
         private PointF CoordToPixel(Vector2 coord)
@@ -290,52 +290,6 @@ namespace Pool1984
             );
         }
 
-        private PointF DirToCubeMap(Vector3 dir, int textureSize, out int plane)
-        {
-            plane =
-                Math.Abs(dir.X) > Math.Abs(dir.Y) && Math.Abs(dir.X) > Math.Abs(dir.Z) ? (dir.X > 0 ? 2 : 4) :
-                Math.Abs(dir.Y) > Math.Abs(dir.Z) ? (dir.Y > 0 ? 3 : 1) : (dir.Z > 0 ? 0 : 5);
-
-            double planeX, planeY, k;
-            switch (plane)
-            {
-                case 0:
-                    k = 1.0 / dir.Z;
-                    planeX = dir.X * k;
-                    planeY = dir.Y * k;
-                    break;
-                case 1:
-                    k = -1.0 / dir.Y;
-                    planeX = dir.X * k;
-                    planeY = dir.Z * k;
-                    break;
-                case 2:
-                    k = 1.0 / dir.X;
-                    planeX = dir.Y * k;
-                    planeY = dir.Z * k;
-                    break;
-                case 3:
-                    k = 1.0 / dir.Y;
-                    planeX = -dir.X * k;
-                    planeY = dir.Z * k;
-                    break;
-                case 4:
-                    k = -1.0 / dir.X;
-                    planeX = -dir.Y * k;
-                    planeY = dir.Z * k;
-                    break;
-                default:    // 5
-                    k = -1.0 / dir.Z;
-                    planeX = dir.X * k;
-                    planeY = -dir.Y * k;
-                    break;
-            }
-            // Inverted x because it's a mirror image
-            int px = (int)((planeX * 0.5 + 0.5) * textureSize).Limit(0, textureSize - 1);
-            int py = (int)((0.5 - planeY * 0.5) * textureSize).Limit(0, textureSize - 1);
-            return new Point(px, py);
-        }
-
         private void RenderBox_Paint(object sender, PaintEventArgs e)
         {
             var pens = new Pen[] { Pens.Red, Pens.Green, Pens.Yellow, Pens.Purple, Pens.Red, Pens.Green, Pens.Yellow };
@@ -343,7 +297,7 @@ namespace Pool1984
                 pens[n] = new Pen(pens[n].Color, 0.1f);
 
             Vector3 p1 = default(Vector3), p2 = default(Vector3);
-            Camera renderCamera = ViewEnabledCheckbox.Checked ? viewCamera : this.camera;
+            Camera renderCamera = ViewEnabledCheckbox.Checked ? viewCamera : this.model.Camera;
 
             double time = timeSetter.Value;
 
@@ -416,7 +370,7 @@ namespace Pool1984
                 }
 
                 if (ViewNumbersFlatCheckBox.Checked)
-                { 
+                {
                     // Draw numbers flat
                     foreach (var position in positions.Values)
                     {
@@ -491,14 +445,14 @@ namespace Pool1984
                 }
             }
 
-            // Draw camera
+            // Draw model.Camera
             if (ViewEnabledCheckbox.Checked)
             {
-                var cp1 = CoordToPixel(renderCamera.VertexToCoord(camera.From + 10.0 * (camera.Look - camera.Hor - camera.Ver).Normalize()));
-                var cp2 = CoordToPixel(renderCamera.VertexToCoord(camera.From + 10.0 * (camera.Look + camera.Hor - camera.Ver).Normalize()));
-                var cp3 = CoordToPixel(renderCamera.VertexToCoord(camera.From + 10.0 * (camera.Look + camera.Hor + camera.Ver).Normalize()));
-                var cp4 = CoordToPixel(renderCamera.VertexToCoord(camera.From + 10.0 * (camera.Look - camera.Hor + camera.Ver).Normalize()));
-                var cp5 = CoordToPixel(renderCamera.VertexToCoord(camera.From));
+                var cp1 = CoordToPixel(renderCamera.VertexToCoord(model.Camera.From + 10.0 * (model.Camera.Look - model.Camera.Hor - model.Camera.Ver).Normalize()));
+                var cp2 = CoordToPixel(renderCamera.VertexToCoord(model.Camera.From + 10.0 * (model.Camera.Look + model.Camera.Hor - model.Camera.Ver).Normalize()));
+                var cp3 = CoordToPixel(renderCamera.VertexToCoord(model.Camera.From + 10.0 * (model.Camera.Look + model.Camera.Hor + model.Camera.Ver).Normalize()));
+                var cp4 = CoordToPixel(renderCamera.VertexToCoord(model.Camera.From + 10.0 * (model.Camera.Look - model.Camera.Hor + model.Camera.Ver).Normalize()));
+                var cp5 = CoordToPixel(renderCamera.VertexToCoord(model.Camera.From));
                 e.Graphics.DrawLine(pens[2], cp1, cp2);
                 e.Graphics.DrawLine(pens[2], cp2, cp3);
                 e.Graphics.DrawLine(pens[2], cp3, cp4);
@@ -514,7 +468,7 @@ namespace Pool1984
             {
                 using (var pen = new Pen(Color.Orange, 0.1f))
                 {
-                    foreach (var ball in entities.Values.OfType<Ball>())
+                    foreach (var ball in primitives.Values.OfType<Ball>())
                     {
                         for (int n = -90; n < 90; n += 10)
                         {
@@ -555,8 +509,8 @@ namespace Pool1984
                 {
                     foreach (var position in positions.Values)
                     {
-                        Vector3 va = camera.From - position.Center;
-                        Vector3 vb = Vector3.Cross(va, camera.Hor).Normalize();
+                        Vector3 va = model.Camera.From - position.Center;
+                        Vector3 vb = Vector3.Cross(va, model.Camera.Hor).Normalize();
                         Vector3 vc = Vector3.Cross(vb, va).Normalize();
                         for (int n = 0; n <= 90; n++)
                         {
@@ -653,10 +607,10 @@ namespace Pool1984
                 for (int lightNr = 0; lightNr < lights.Length; lightNr++)
                 {
                     var light = lights[lightNr];
-                    var felt = entities["Felt"];
+                    var felt = primitives["Felt"];
                     using (var pen = new Pen(Color.FromArgb(100, pens[lightNr].Color), 0.5f))
                     {
-                        foreach (var ball in entities.Values.OfType<Ball>())
+                        foreach (var ball in primitives.Values.OfType<Ball>())
                         {
                             Vector3 va = light.Center - ball.GetCenter(time);
                             Vector3 vb = Vector3.Cross(va, new Vector3(1.0, 0.0, 0.0)).Normalize();
@@ -684,14 +638,14 @@ namespace Pool1984
                 foreach (var position in positions.Values)
                 {
                     var number = position.Number;
-                    var ball = entities[position.Target] as Ball;
+                    var ball = primitives[position.Target] as Ball;
                     if (number != null)
                     {
                         PointF pp1 = default(PointF);
                         for (int n = 0; n <= 90; n++)
                         {
-                            double angle1 = 0.5 * (ball.MinAngle1 + ball.MaxAngle1) + 0.5 * (ball.MaxAngle1 - ball.MinAngle1) * Math.Cos(n * Math.PI / 45.0);
-                            double angle2 = 0.5 * (ball.MinAngle2 + ball.MaxAngle2) + 0.5 * (ball.MaxAngle2 - ball.MinAngle2) * Math.Sin(n * Math.PI / 45.0);
+                            double angle1 = 0.5 * (ball.GetMinAngle1(time) + ball.GetMaxAngle1(time)) + 0.5 * (ball.GetMaxAngle1(time) - ball.GetMinAngle1(time)) * Math.Cos(n * Math.PI / 45.0);
+                            double angle2 = 0.5 * (ball.GetMinAngle2(time) + ball.GetMaxAngle2(time)) + 0.5 * (ball.GetMaxAngle2(time) - ball.GetMinAngle2(time)) * Math.Sin(n * Math.PI / 45.0);
                             Vector3 v = new Vector3(
                                 Math.Cos(angle1) * Math.Cos(angle2),
                                 Math.Sin(angle1) * Math.Cos(angle2),
@@ -744,26 +698,28 @@ namespace Pool1984
                                 PointF p1 = default(PointF), p2 = default(PointF);
                                 for (int cornerNr = 0; cornerNr <= 4; cornerNr++)
                                 {
-                                    // Ray through a reflection (on the ball) of the corner of a box, seen from the camera
-                                    var ray = this.camera.CoordToRay(PixelToCoord(position.Boxes[boxNr][cornerNr % 4]));
+                                    // Ray through a reflection (on the ball) of the corner of a box, seen from the model.Camera
+                                    var ray = this.model.Camera.CoordToRay(PixelToCoord(position.Boxes[boxNr][cornerNr % 4]));
 
                                     var intsec = position.GetClosestIntersection(ray, IntersectionMode.PositionAndNormal);
                                     if (intsec.Hit)
                                     {
                                         // Calculate mirror vector;
                                         double a = -Vector3.Dot(intsec.Normal, ray.Direction);
-                                        Vector3 direction = ray.Direction + 2.0 * a * intsec.Normal;
+                                        Vector3 dir = ray.Direction + 2.0 * a * intsec.Normal;
 
                                         double cs = Math.Cos(position.CubeMapOffset * Math.PI / 180.0);
                                         double sn = Math.Sin(position.CubeMapOffset * Math.PI / 180.0);
                                         Vector3 transformed = new Vector3(
-                                            direction.X * cs + direction.Y * sn,
-                                            direction.Y * cs - direction.X * sn,
-                                            direction.Z
+                                            dir.X * cs + dir.Y * sn,
+                                            dir.Y * cs - dir.X * sn,
+                                            dir.Z
                                         );
-                                        p2 = DirToCubeMap(transformed, textureSize, out int plane);
-                                        p2.X = p2.X + (plane - 1) * textureSize + cubemapOffset.X;
-                                        p2.Y = p2.Y + cubemapOffset.Y;
+                                        var p = CubeTexture.Project(dir, out int plane);
+                                        p2 = new PointF(
+                                            (float)(p.X + (plane - 1) * textureSize + cubemapOffset.X),
+                                            (float)(p.Y + cubemapOffset.Y)
+                                        );
                                     }
                                     if (cornerNr > 0)
                                         e.Graphics.DrawLine(pen, p1, p2);
@@ -811,10 +767,10 @@ namespace Pool1984
             double offsety = OffsetYSetter.Value;
             double dist = CamDistSetter.Value;
 
-            camera.Angle = CamRotationSetter.Value;
-            double cs = Math.Cos(camera.Angle * Math.PI / 180.0);
-            double sn = Math.Cos(camera.Angle * Math.PI / 180.0);
-            camera.From = new Vector3(offsetx * cs + offsety * sn, offsety * cs - offsetx * sn, 1).Normalize() * dist;
+            model.Camera.Angle = CamRotationSetter.Value;
+            double cs = Math.Cos(model.Camera.Angle * Math.PI / 180.0);
+            double sn = Math.Cos(model.Camera.Angle * Math.PI / 180.0);
+            model.Camera.From = new Vector3(offsetx * cs + offsety * sn, offsety * cs - offsetx * sn, 1).Normalize() * dist;
 
             CalcScene();
             RenderBox.Invalidate();
@@ -823,7 +779,7 @@ namespace Pool1984
 
         private void CamDistSetter_ValueChanged(object sender, EventArgs e)
         {
-            camera.From = camera.At - Vector3.Normalize(camera.Look) * CamDistSetter.Value;
+            model.Camera.From = model.Camera.At - Vector3.Normalize(model.Camera.Look) * CamDistSetter.Value;
             CalcScene();
             RenderBox.Invalidate();
             CubeMapBox.Invalidate();
@@ -849,8 +805,8 @@ namespace Pool1984
         // Calculations
         private void CalcScene()
         {
-            if (camera.ApertureH < 1.0) camera.ApertureH = 1.0;
-            if (camera.ApertureV < 1.0) camera.ApertureV = 1.0;
+            if (model.Camera.ApertureH < 1.0) model.Camera.ApertureH = 1.0;
+            if (model.Camera.ApertureV < 1.0) model.Camera.ApertureV = 1.0;
             for (int iter1 = 0; iter1 < 4; iter1++)
             {
                 foreach (var position in positions.Values)
@@ -859,20 +815,20 @@ namespace Pool1984
                     Vector2 q2 = q1;
                     for (int iter2 = 0; iter2 < 10; iter2++)
                     {
-                        var ray = camera.CoordToRay(q2);
+                        var ray = model.Camera.CoordToRay(q2);
                         double f = (1.0 - ray.Origin.Z) / ray.Direction.Z;
                         position.Center = ray.Origin + ray.Direction * f;
                         double minx = 1E12, maxx = -1E12, miny = 1E12, maxy = -1E12;
 
                         // Measure the graphical extents of the rendered ball
-                        Vector3 va = camera.From - position.Center;
-                        Vector3 vb = Vector3.Cross(va, camera.Hor).Normalize();
+                        Vector3 va = model.Camera.From - position.Center;
+                        Vector3 vb = Vector3.Cross(va, model.Camera.Hor).Normalize();
                         Vector3 vc = Vector3.Cross(vb, va).Normalize();
                         for (int n = 0; n < 90; n++)
                         {
                             double f1 = Math.Cos(n * Math.PI / 45.0);
                             double f2 = Math.Sin(n * Math.PI / 45.0);
-                            Vector2 px = camera.VertexToCoord(position.Center + f1 * vb + f2 * vc);
+                            Vector2 px = model.Camera.VertexToCoord(position.Center + f1 * vb + f2 * vc);
                             if (px.X < minx) minx = px.X;
                             if (px.X > maxx) maxx = px.X;
                             if (px.Y < miny) miny = px.Y;
@@ -904,14 +860,14 @@ namespace Pool1984
                     }
 
                     // Measure the graphical extents of the rendered ball
-                    Vector3 va = camera.From - position.Center;
-                    Vector3 vb = Vector3.Cross(va, camera.Hor).Normalize();
+                    Vector3 va = model.Camera.From - position.Center;
+                    Vector3 vb = Vector3.Cross(va, model.Camera.Hor).Normalize();
                     Vector3 vc = Vector3.Cross(vb, va).Normalize();
                     for (int n = 0; n < 90; n++)
                     {
                         double f1 = Math.Cos(n * Math.PI / 45.0);
                         double f2 = Math.Sin(n * Math.PI / 45.0);
-                        Vector2 v = camera.VertexToCoord(position.Center + f1 * vb + f2 * vc);
+                        Vector2 v = model.Camera.VertexToCoord(position.Center + f1 * vb + f2 * vc);
                         if (v.X < minx2) minx2 = v.X;
                         if (v.X > maxx2) maxx2 = v.X;
                         if (v.Y < miny2) miny2 = v.Y;
@@ -923,12 +879,12 @@ namespace Pool1984
                 }
                 if (sum != 0.0)
                 {
-                    camera.ApertureH = camera.ApertureH * facH / sum;
-                    camera.ApertureV = camera.ApertureV * facV / sum;
+                    model.Camera.ApertureH = model.Camera.ApertureH * facH / sum;
+                    model.Camera.ApertureV = model.Camera.ApertureV * facV / sum;
                 }
             }
-            ApertureHLabel.Text = camera.ApertureH.ToString("0.00°");
-            ApertureVLabel.Text = camera.ApertureV.ToString("0.00°");
+            ApertureHLabel.Text = model.Camera.ApertureH.ToString("0.00°");
+            ApertureVLabel.Text = model.Camera.ApertureV.ToString("0.00°");
 
             // Calculate world coordinates of the bitmap
             for (int n = 0; n < 4; n++)
@@ -937,7 +893,7 @@ namespace Pool1984
                     n == 0 || n == 3 ? 0f : pictureWidth,
                     n == 0 || n == 1 ? 0f : pictureHeight
                 ));
-                var ray = camera.CoordToRay(p1);
+                var ray = model.Camera.CoordToRay(p1);
                 double f = (0.0 - ray.Origin.Z) / ray.Direction.Z;
                 pictureRect[n] = ray.Origin + ray.Direction * f;
             }
@@ -954,7 +910,7 @@ namespace Pool1984
                     foreach (var point in spot.InnerEllipse.GetOutline(16))
                     {
                         Vector2 v2 = PixelToCoord(point);
-                        var intsec = position.GetClosestIntersection(camera.CoordToRay(v2), IntersectionMode.PositionAndNormal);
+                        var intsec = position.GetClosestIntersection(model.Camera.CoordToRay(v2), IntersectionMode.PositionAndNormal);
                         if (intsec.Hit)
                         {
                             sum += intsec.Normal;
@@ -963,7 +919,7 @@ namespace Pool1984
                     Ray reflectedRay = new Ray();
                     Vector3 normal = sum.Normalize();   // The average of all normals found in the loop
                     reflectedRay.Origin = position.Center + normal;
-                    Vector3 direction = (reflectedRay.Origin - camera.From).Normalize();
+                    Vector3 direction = (reflectedRay.Origin - model.Camera.From).Normalize();
                     double a = -Vector3.Dot(normal, direction);
                     reflectedRay.Direction = direction + 2.0 * a * normal;
                     spot.ReflectedRay = reflectedRay;
@@ -986,14 +942,14 @@ namespace Pool1984
                         double sum = 0.0;
                         foreach (var point in ellipse.GetOutline(16))
                         {
-                            var intsec = position.GetClosestIntersection(camera.CoordToRay(PixelToCoord(point)), IntersectionMode.PositionAndNormal);
+                            var intsec = position.GetClosestIntersection(model.Camera.CoordToRay(PixelToCoord(point)), IntersectionMode.PositionAndNormal);
                             if (intsec.Hit)
                             {
                                 Ray reflectedRay = new Ray
                                 {
                                     Origin = intsec.Position
                                 };
-                                Vector3 direction = (reflectedRay.Origin - camera.From).Normalize();
+                                Vector3 direction = (reflectedRay.Origin - model.Camera.From).Normalize();
                                 double a = -Vector3.Dot(intsec.Normal, direction);
                                 reflectedRay.Direction = direction + 2.0 * a * intsec.Normal;
 
@@ -1036,7 +992,7 @@ namespace Pool1984
                     {
                         // Calculate ray going through the ellipse points
                         Vector2 px = PixelToCoord(point);
-                        ray = camera.CoordToRay(px);
+                        ray = model.Camera.CoordToRay(px);
 
                         // Calculate intersection with ball
                         intsec = position.GetClosestIntersection(ray, IntersectionMode.PositionAndNormal);
@@ -1056,9 +1012,9 @@ namespace Pool1984
                     rot = rot * Matrix4.RotateY(textureOrientation.Y);
 
                     // -Orientation of the texture by using the captured OrientStart and OrientEnd
-                    Ray rayStart = camera.CoordToRay(PixelToCoord(number.OrientStart));
+                    Ray rayStart = model.Camera.CoordToRay(PixelToCoord(number.OrientStart));
                     var intsecStart = position.GetClosestIntersection(rayStart, IntersectionMode.PositionAndNormal);
-                    Ray rayEnd = camera.CoordToRay(PixelToCoord(number.OrientEnd));
+                    Ray rayEnd = model.Camera.CoordToRay(PixelToCoord(number.OrientEnd));
                     var intsecEnd = position.GetClosestIntersection(rayEnd, IntersectionMode.PositionAndNormal);
                     var a = intsecEnd.Normal * rot - intsecStart.Normal * rot;
                     textureOrientation.X = Math.Atan2(a.Y, a.Z) + Math.PI;
@@ -1075,7 +1031,7 @@ namespace Pool1984
                     {
                         // Calculate ray going through the ellipse points
                         Vector2 px = PixelToCoord(point);
-                        ray = camera.CoordToRay(px);
+                        ray = model.Camera.CoordToRay(px);
 
                         // Calculate intersection with ball
                         intsec = position.GetClosestIntersection(ray, IntersectionMode.PositionAndNormal);
@@ -1090,53 +1046,54 @@ namespace Pool1984
                         if (angle2 > maxAngle2) maxAngle2 = angle2;
                         sum += intsec.Normal;
                     }
-                    ball.MinAngle1 = minAngle1;
-                    ball.MaxAngle1 = maxAngle1;
-                    ball.MinAngle2 = minAngle2;
-                    ball.MaxAngle2 = maxAngle2;
+                    position.MinAngle1 = minAngle1;
+                    position.MaxAngle1 = maxAngle1;
+                    position.MinAngle2 = minAngle2;
+                    position.MaxAngle2 = maxAngle2;
                 }
             }
             CalibrateColors();
-            
+
             // Apply keyframes
-            foreach (var entity in entities.Values.OfType<Ball>())
+            foreach (var primitive in primitives.Values.OfType<Ball>())
             {
-                entity.ApplyKeyframes(keyframes);
+                primitive.ApplyKeyframes(keyframes);
             }
         }
 
         private void CalibrateColors()
         {
+            var raytracer = new Raytracer(2, 2, renderBitmap.Width, renderBitmap.Height, model);
 
             // Calibrate felt color
-            var felt = entities["Felt"];
+            var felt = primitives["Felt"];
             for (int n = 0; n < 5; n++)
             {
-                var actual = RenderPixel(colorRefs[0].PixelCenter);
+                var actual = raytracer.RenderPixel(colorRefs[0].PixelCenter);
                 felt.DiffuseColor = felt.DiffuseColor + colorRefs[0].Measured - actual;
             }
 
             // Calibrate ball 1 color
-            var ball = entities["Ball 1"];
+            var ball = (Ball)primitives["Ball 1"];
             for (int n = 0; n < 5; n++)
             {
-                var actual = RenderPixel(colorRefs[5].PixelCenter);
+                var actual = raytracer.RenderPixel(colorRefs[5].PixelCenter);
                 ball.BandColor = ball.DiffuseColor = ball.DiffuseColor + colorRefs[5].Measured - actual;
             }
 
             // Calibrate ball 4 color
-            ball = entities["Ball 4"];
+            ball = (Ball)primitives["Ball 4"];
             for (int n = 0; n < 5; n++)
             {
-                var actual = RenderPixel(colorRefs[6].PixelCenter);
+                var actual = raytracer.RenderPixel(colorRefs[6].PixelCenter);
                 ball.BandColor = ball.DiffuseColor = ball.DiffuseColor + colorRefs[6].Measured - actual;
             }
 
             // Calibrate white ball color
-            ball = entities["Ball w"];
+            ball = (Ball)primitives["Ball w"];
             for (int n = 0; n < 5; n++)
             {
-                var actual = RenderPixel(colorRefs[7].PixelCenter);
+                var actual = raytracer.RenderPixel(colorRefs[7].PixelCenter);
                 ball.BandColor = ball.DiffuseColor = ball.DiffuseColor + colorRefs[7].Measured - actual;
             }
 
@@ -1148,20 +1105,29 @@ namespace Pool1984
             //}
             // Calibrate number texture white
 
+            Color3 numberTextureWhiteColor = Color3.FromColor(Color.White);
+            Color3 numberTextureBlackColor = Color3.FromColor(Color.Black);
             for (int n = 0; n < 5; n++)
             {
-                var actual = RenderPixel(colorRefs[9].PixelCenter);
+                var actual = raytracer.RenderPixel(colorRefs[9].PixelCenter);
                 numberTextureWhiteColor = numberTextureWhiteColor + colorRefs[9].Measured - actual;
+                primitives["Ball 1"].Texture.SetColorTransformation(numberTextureBlackColor, numberTextureWhiteColor);
             }
             for (int n = 0; n < 5; n++)
             {
-                var actual = RenderPixel(colorRefs[10].PixelCenter);
+                var actual = raytracer.RenderPixel(colorRefs[10].PixelCenter);
                 numberTextureBlackColor = numberTextureBlackColor + colorRefs[10].Measured - actual;
+                primitives["Ball 1"].Texture.SetColorTransformation(numberTextureBlackColor, numberTextureWhiteColor);
             }
 
-            ball = entities["Ball 9"];
-            ball.BandColor = entities["Ball 1"].DiffuseColor;
-            ball.DiffuseColor = entities["Ball w"].DiffuseColor;
+            primitives["Ball 1"].Texture.SetColorTransformation(numberTextureBlackColor, numberTextureWhiteColor);
+            primitives["Ball 9"].Texture.SetColorTransformation(numberTextureBlackColor, numberTextureWhiteColor);
+            primitives["Ball 8"].Texture.SetColorTransformation(numberTextureBlackColor, numberTextureWhiteColor);
+            primitives["Ball 4"].Texture.SetColorTransformation(numberTextureBlackColor, numberTextureWhiteColor);
+
+            ball = (Ball)primitives["Ball 9"];
+            ball.BandColor = primitives["Ball 1"].DiffuseColor;
+            ball.DiffuseColor = primitives["Ball w"].DiffuseColor;
         }
 
         private void MeasureColorRefs()
@@ -1219,14 +1185,14 @@ namespace Pool1984
 
                     // Find the graphical box containing the sphere
                     double minx = 1E12, maxx = -1E12, miny = 1E12, maxy = -1E12;
-                    Vector3 va = camera.From - position.Center;
-                    Vector3 vb = Vector3.Cross(va, camera.Hor).Normalize();
+                    Vector3 va = model.Camera.From - position.Center;
+                    Vector3 vb = Vector3.Cross(va, model.Camera.Hor).Normalize();
                     Vector3 vc = Vector3.Cross(vb, va).Normalize();
                     for (int n = 0; n < 90; n++)
                     {
                         double f1 = Math.Cos(n * Math.PI / 45.0);
                         double f2 = Math.Sin(n * Math.PI / 45.0);
-                        Vector2 px = camera.VertexToCoord(position.Center + f1 * vb + f2 * vc);
+                        Vector2 px = model.Camera.VertexToCoord(position.Center + f1 * vb + f2 * vc);
                         if (px.X < minx) minx = px.X;
                         if (px.X > maxx) maxx = px.X;
                         if (px.Y < miny) miny = px.Y;
@@ -1241,25 +1207,20 @@ namespace Pool1984
                     for (double y = p1.Y; y <= p2.Y; y += stepy)
                         for (double x = p1.X; x <= p2.X; x += stepx)
                         {
-                            Ray ray = camera.CoordToRay(new Vector2(x, y));
+                            Ray ray = model.Camera.CoordToRay(new Vector2(x, y));
                             var intsec = position.GetClosestIntersection(ray, IntersectionMode.PositionAndNormal);
                             if (intsec.Hit)
                             {
+                                // Calculate mirror vector
                                 double a = -Vector3.Dot(intsec.Normal, ray.Direction);
-
-                                // Conversion of direction vector to texture coords
                                 Vector3 direction = ray.Direction + 2.0 * a * intsec.Normal;
-                                double cs = Math.Cos(position.CubeMapOffset * Math.PI / 180.0);
-                                double sn = Math.Sin(position.CubeMapOffset * Math.PI / 180.0);
-                                Vector3 transformed = new Vector3(
-                                    direction.X * cs + direction.Y * sn,
-                                    direction.Y * cs - direction.X * sn,
-                                    direction.Z
-                                );
-                                PointF p = DirToCubeMap(transformed, textureSize, out int plane);
+                                Vector2 p = CubeTexture.Project(direction, out int plane);
                                 if (plane > 0 && plane < 5)     // we render just the 4 sides
                                 {
-                                    int planeOffset = (plane - 1) * textureSize;
+                                    Point q = new Point(
+                                        (int)((p.X * 0.5 + 0.5) * textureSize).Limit(0, textureSize - 1) + (plane - 1) * textureSize,
+                                        (int)((p.Y * 0.5 + 0.5) * textureSize).Limit(0, textureSize - 1)
+                                    );
                                     unsafe
                                     {
                                         var pixelCoord = CoordToPixel(new Vector2(x, y));
@@ -1279,8 +1240,9 @@ namespace Pool1984
                                             // Reading from original picture
                                             adrReadOriginal = (byte*)(bmpDataReadOriginal.Scan0 + (int)(pixelCoord.Y * pictureScale) * bmpDataReadOriginal.Stride + (int)(pixelCoord.X * pictureScale) * 3);
                                         }
+
                                         // Writing to cube map
-                                        byte* adrWrite = (byte*)(bmpDataWrite.Scan0 + (int)p.Y * bmpDataWrite.Stride + ((int)p.X + planeOffset) * 3);
+                                        byte* adrWrite = (byte*)(bmpDataWrite.Scan0 + q.Y * bmpDataWrite.Stride + q.X * 3);
 
                                         *adrWrite++ = *adrReadOriginal++;
                                         *adrWrite++ = *adrReadOriginal++;
@@ -1306,7 +1268,6 @@ namespace Pool1984
             {
                 Bitmap bmp = position.SphereMap;
                 Number number = position.Number;
-                Ball ball = position.Ball;
                 if (number != null && bmp != null)
                 {
                     // Writing to sphere map
@@ -1318,8 +1279,8 @@ namespace Pool1984
                     {
                         for (int x = 0; x < bmp.Width; x++)
                         {
-                            double angle1 = x * (ball.MaxAngle1 - ball.MinAngle1) / bmp.Width + ball.MinAngle1;
-                            double angle2 = y * (ball.MinAngle2 - ball.MaxAngle2) / bmp.Height + ball.MaxAngle2;
+                            double angle1 = x * (position.MaxAngle1 - position.MinAngle1) / bmp.Width + position.MinAngle1;
+                            double angle2 = y * (position.MinAngle2 - position.MaxAngle2) / bmp.Height + position.MaxAngle2;
                             Vector3 v = new Vector3(
                                 Math.Cos(angle1) * Math.Cos(angle2),
                                 Math.Sin(angle1) * Math.Cos(angle2),
@@ -1327,7 +1288,7 @@ namespace Pool1984
                             v = v * position.TextureToWorld;
                             unsafe
                             {
-                                var pixelCoord = CoordToPixel(camera.VertexToCoord(position.Center + v));
+                                var pixelCoord = CoordToPixel(model.Camera.VertexToCoord(position.Center + v));
                                 // Reading from original picture
                                 byte* adrRead = (byte*)(bmpDataRead.Scan0 + (int)(pixelCoord.Y * pictureScale) * bmpDataRead.Stride + (int)(pixelCoord.X * pictureScale) * 3);
                                 // Writing to sphere map
@@ -1403,14 +1364,6 @@ namespace Pool1984
             }
         }
 
-        // Rendering 
-        private class Line
-        {
-            public byte[] LineData { get; set; }
-
-            public int Y { get; set; }
-        }
-
         private CancellationTokenSource cts = null;
 
         private async void RenderButton_Click(object sender, EventArgs e)
@@ -1428,7 +1381,8 @@ namespace Pool1984
                 ViewRenderingCheckBox.Checked = true;
                 int width = renderBitmap.Width;
                 int height = renderBitmap.Height;
-                IProgress<Line> progress = new Progress<Line>(line =>
+                var raytracer = new Raytracer(nrSamplesX, nrSamplesY, renderBitmap.Width, renderBitmap.Height, model);
+                IProgress<Raytracer.Line> progress = new Progress<Raytracer.Line>(line =>
                 {
                     BitmapData bmpDataWrite = null;
                     try
@@ -1456,10 +1410,21 @@ namespace Pool1984
                     {
                         g.Clear(Color.Gray);
                     }
-                    await Task.Run(() => Render(width, height, progress, cts.Token));
+                    await Task.Run(() => raytracer.Render(progress, cts.Token));
                 }
                 catch (OperationCanceledException)
                 {
+                }
+            }
+        }
+
+        private void SaveRenderingButton_Click(object sender, EventArgs e)
+        {
+            if (SaveRenderingDialog.ShowDialog() == DialogResult.OK)
+            {
+                using (var s = new FileStream(SaveRenderingDialog.FileName, FileMode.Create, FileAccess.Write, FileShare.Read))
+                {
+                    renderBitmap.Save(s, ImageFormat.Png);
                 }
             }
         }
@@ -1472,179 +1437,13 @@ namespace Pool1984
             );
             if (p.X >= 0 && p.X <= renderBitmap.Width && p.Y >= 0 && p.Y <= renderBitmap.Height)
             {
-                Color3 col = RenderPixel(p);
+                var raytracer = new Raytracer(nrSamplesX, nrSamplesY, renderBitmap.Width, renderBitmap.Height, model);
+                Color3 col = raytracer.RenderPixel(p);
                 RenderButton.BackColor = col.ToColor();
             }
             else
             {
                 RenderButton.BackColor = SystemColors.Control;
-            }
-        }
-
-        Vector2 Hammersley(int i, int numSamples)
-        {
-            uint b = (uint)i;
-            b = (b << 16) | (b >> 16);
-            b = ((b & 0x55555555u) << 1) | ((b & 0xAAAAAAAAu) >> 1);
-            b = ((b & 0x33333333u) << 2) | ((b & 0xCCCCCCCCu) >> 2);
-            b = ((b & 0x0F0F0F0Fu) << 4) | ((b & 0xF0F0F0F0u) >> 4);
-            b = ((b & 0x00FF00FFu) << 8) | ((b & 0xFF00FF00u) >> 8);
-            double radicalInverseVDC = b * 2.0 * 2.3283064365386963e-10 - 1.0;
-            return new Vector2(i * 2.0 / numSamples - 1.0, radicalInverseVDC);
-        }
-
-        private Random rnd = new Random();
-
-        private Color3 RenderPixel(PointF point)
-        {
-            Color3 color = new Color3();
-            for (int sampleY = 0; sampleY < nrSamplesY; sampleY++)
-            {
-                for (int sampleX = 0; sampleX < nrSamplesX; sampleX++)
-                {
-                    PointF point2 = new PointF(
-                        point.X + (float)(sampleX + rnd.NextDouble()) / nrSamplesX,
-                        point.Y + (float)(sampleY + rnd.NextDouble()) / nrSamplesY
-                    );
-                    Vector2 coord = PixelToCoord(point2);
-                    Ray ray = camera.CoordToRay(coord);
-                    color += RenderRay(ray);
-                }
-            }
-            return color / (nrSamplesX * nrSamplesY);
-        }
-
-        private Color3 RenderRay(Ray ray, int depth = 0)
-        {
-            double time = rnd.NextDouble();
-
-            Color3 col = default(Color3);
-            Intersection closest = default(Intersection);
-            foreach (var entity in entities.Values)
-            {
-                var intsec = entity.GetClosestIntersection(ray, IntersectionMode.PositionAndNormal, time, maxDist: 100.0);
-                if (intsec.Hit)
-                {
-                    if (intsec.Distance < closest.Distance || !closest.Hit)
-                    {
-                        closest = intsec;
-                    }
-                }
-            }
-
-            if (closest.Hit)
-            {
-                Entity entity = closest.Entity;
-
-                // Hack to have reflected the cloth not too much
-                Color3 diffuseColor =
-                    (entity is Plane) && depth > 0 ?
-                    entity.DiffuseColor * 0.1 :
-                    entity.DiffuseColor;
-
-                // Calculate mirror ray
-                double a = -Vector3.Dot(closest.Normal, ray.Direction);
-                Ray mirrorRay = new Ray { Origin = closest.Position, Direction = ray.Direction + 2.0 * a * closest.Normal };
-
-                // Get texture
-                if (entity.Texture != null)
-                {
-                    Vector3 transformedNormal = closest.Normal * entity.GetWorldToTexture(time);
-                    Vector2 p = entity.GetTextureCoordinates(transformedNormal);
-                    if (p.Length < 1.0)
-                    {
-                        Point q = new Point((int)((p.X * 0.5 + 0.5) * textureSize), (int)((p.Y * 0.5 + 0.5) * textureSize));
-                        double f = entity.Texture.GetPixel(q.X, q.Y).R / 255.0;
-                        diffuseColor = numberTextureBlackColor + (numberTextureWhiteColor - numberTextureBlackColor) * f;
-                    }
-                    else
-                    {
-                        if (Math.Abs(transformedNormal.X) < 0.5)
-                        {
-                            diffuseColor = entity.BandColor;
-                        }
-                    }
-                }
-
-                // Calculate lights
-                for (int lightNr = 0; lightNr < lights.Length; lightNr++)
-                {
-                    var light = lights[lightNr];
-                    var lightVec1 = light.Center - closest.Position;
-
-                    var lightVec2 = lightVec1.Normalize();
-                    Vector3 hor = Vector3.Cross(new Vector3(0.0, 1.0, 0.0), lightVec2).Normalize();
-                    Vector3 ver = Vector3.Cross(lightVec2, hor).Normalize();
-
-                    Vector2 v1 = new Vector2(rnd.NextDouble() * 2.0 - 1.0, rnd.NextDouble() * 2.0 - 1.0) * light.Radius1;
-                    var lightVec3 = lightVec1 + hor * v1.X + ver * v1.Y;
-                    double lightDist = lightVec3.Length;
-
-                    Ray shadowRay = new Ray { Origin = closest.Position, Direction = lightVec3 / lightDist };
-
-                    double shadow = 1.0;
-                    foreach (var shadowEntity in entities.Values.OfType<Ball>())
-                    {
-                        var intsec = shadowEntity.GetClosestIntersection(shadowRay, IntersectionMode.Hit, Intersection.MinDistance); //, lightDist + 0.01);
-                        if (intsec.Hit)
-                        {
-                            shadow = 0.0;
-                            break;
-                        }
-                    }
-
-                    // Calculate specular highlight analytically
-                    double specInt = 0.0;
-                    if (entity is Ball)
-                    {
-                        double k =
-                            Vector3.Dot(light.Center - mirrorRay.Origin, lightVec2) /
-                            Vector3.Dot(mirrorRay.Direction, lightVec2);
-                        Vector3 v = mirrorRay.Origin + k * mirrorRay.Direction - light.Center;
-                        specInt = k > Intersection.MinDistance && k < lightVec1.Length + light.Radius2 ? ((v.Length - light.Radius2) / (light.Radius1 - light.Radius2)).Limit(0.0, 1.0) : 0;
-                    }
-
-                    Ray lightRay = new Ray { Origin = closest.Position, Direction = lightVec2 };
-                    double diffuseIntensity = Math.Max(0.0, Vector3.Dot(lightRay.Direction, closest.Normal)) * 0.333 * shadow;
-                    double specularIntensity = specInt * shadow;
-                    col += diffuseIntensity * light.Color * diffuseColor + specularIntensity * light.Color + ambientColor;
-
-                    if (depth < 3 && !(entity is Plane))
-                        col += reflection * RenderRay(mirrorRay, depth + 1);
-                }
-            }
-            else
-            // If no object hit, check the environment map
-            {
-                var px = DirToCubeMap(ray.Direction, cubeTextureSize, out int plane);
-                if (plane > 0 && plane < 5)
-                {
-                    col = Color3.FromColor(cubeMap.GetPixel((int)px.X + (plane - 1) * cubeTextureSize, (int)px.Y));
-                }
-            }
-            return col;
-        }
-
-        private void Render(int width, int height, IProgress<Line> progress, CancellationToken ct)
-        {
-            Camera camera = this.camera.Clone();
-            for (int y = 0; y < height; y++)
-            {
-                int adr = 0;
-                byte[] lineData = new byte[width * 3];
-                for (int x = 0; x < width; x++)
-                {
-                    Color3 color = RenderPixel(new PointF(x, y));
-                    var resultColor = color.ToColor();
-                    lineData[adr++] = (resultColor.B);
-                    lineData[adr++] = (resultColor.G);
-                    lineData[adr++] = (resultColor.R);
-                }
-                if (y >= 0)
-                {
-                    progress.Report(new Line { LineData = lineData, Y = y });
-                }
-                ct.ThrowIfCancellationRequested();
             }
         }
     }

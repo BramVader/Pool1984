@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model.cs" />
     <Compile Include="Models\ColorRef.cs" />
     <Compile Include="Controls\ValueSetter.cs">
       <SubType>UserControl</SubType>
@@ -81,10 +82,13 @@
     </Compile>
     <Compile Include="Primitives\BallPosition.cs" />
     <Compile Include="Primitives\Ball.cs" />
-    <Compile Include="Primitives\Entity.cs" />
+    <Compile Include="Primitives\Primitive.cs" />
     <Compile Include="Primitives\Plane.cs" />
+    <Compile Include="Primitives\CubeTexture.cs" />
+    <Compile Include="Primitives\Texture.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Raytracer.cs" />
     <EmbeddedResource Include="Controls\ValueSetter.resx">
       <DependentUpon>ValueSetter.cs</DependentUpon>
     </EmbeddedResource>
@@ -120,6 +124,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Documentation\Cubemap_small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Documentation\Cloth.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

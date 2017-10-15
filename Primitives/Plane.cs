@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace Pool1984
 {
-    class Plane : Entity
+    class Plane : Primitive
     {
         public Vector3 Center { get; set; }
         public Vector3 Normal { get; set; }
@@ -34,7 +34,7 @@ namespace Pool1984
             return intsec;
         }
 
-        public override Vector2 GetTextureCoordinates(Vector3 transformedNormal)
+        public override Vector2 GetTextureCoordinates(Vector3 transformedNormal, double time)
         {
             throw new NotImplementedException();
         }
