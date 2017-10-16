@@ -26,11 +26,11 @@ namespace Pool1984
             new Number { Target = "Ball 1", PixelCenter = new PointF(124.72f, 175.53f), PixelSize = new SizeF(90.68f, 95.44f), Degrees = -24.00f, OrientStart = new PointF(127.38f, 201.46f), OrientEnd = new PointF(138.72f, 156.11f) },
             new Number { Target = "Ball 4a", PixelCenter = new PointF(641.06f, 154.74f), PixelSize = new SizeF(74.17f, 93.62f), Degrees = 41.30f, OrientStart = new PointF(653.94f, 144.58f), OrientEnd = new PointF(644.95f, 184.83f) },
             new Number { Target = "Ball 4b", PixelCenter = new PointF(665.06f, 142.90f), PixelSize = new SizeF(81.02f, 93.51f), Degrees = 28.00f, OrientStart = new PointF(653.94f, 144.58f), OrientEnd = new PointF(644.95f, 184.83f) },
-            new Number { Target = "Ball 8a", PixelCenter = new PointF(520.97f, 181.08f), PixelSize = new SizeF(98.21f, 93.10f), Degrees = 96.00f, OrientStart = new PointF(534.89f, 163.29f), OrientEnd = new PointF(510.13f, 199.19f) },
-            new Number { Target = "Ball 8b", PixelCenter = new PointF(486.89f, 205.26f), PixelSize = new SizeF(92.53f, 94.44f), Degrees = -4.80f, OrientStart = new PointF(682.86f, 189.74f), OrientEnd = new PointF(673.86f, 169.34f) },
-            new Number { Target = "Ball 9a", PixelCenter = new PointF(288.97f, 209.33f), PixelSize = new SizeF(90.71f, 57.60f), Degrees = 41.00f, OrientStart = new PointF(282.61f, 189.37f), OrientEnd = new PointF(302.26f, 220.74f) },
-            new Number { Target = "Ball 9b", PixelCenter = new PointF(324.39f, 264.20f), PixelSize = new SizeF(90.71f, 90.71f), Degrees = 30.00f, OrientStart = new PointF(320.21f, 224.52f), OrientEnd = new PointF(340.53f, 259.95f) },
-            new Number { Target = "Ball 9c", PixelCenter = new PointF(332.01f, 279.48f), PixelSize = new SizeF(90.71f, 90.71f), Degrees = 41.00f, OrientStart = new PointF(334.29f, 262.78f), OrientEnd = new PointF(324.94f, 302.00f) },
+            new Number { Target = "Ball 8a", PixelCenter = new PointF(486.89f, 205.26f), PixelSize = new SizeF(92.53f, 94.44f), Degrees = -4.80f, OrientStart = new PointF(498.23f, 189.74f), OrientEnd = new PointF(473.28f, 225.27f) },
+            new Number { Target = "Ball 8b", PixelCenter = new PointF(520.97f, 181.08f), PixelSize = new SizeF(98.21f, 93.10f), Degrees = 96.00f, OrientStart = new PointF(534.89f, 163.29f), OrientEnd = new PointF(510.13f, 199.19f) },
+            new Number { Target = "Ball 9a", PixelCenter = new PointF(325.66f, 302.37f), PixelSize = new SizeF(90.68f, 84.29f), Degrees = -12.00f, OrientStart = new PointF(339.87f, 292.17f), OrientEnd = new PointF(315.93f, 308.80f) },
+            new Number { Target = "Ball 9b", PixelCenter = new PointF(330.18f, 279.10f), PixelSize = new SizeF(90.68f, 95.44f), Degrees = -24.00f, OrientStart = new PointF(342.89f, 246.81f), OrientEnd = new PointF(320.21f, 269.24f) },
+            new Number { Target = "Ball 9c", PixelCenter = new PointF(291.46f, 214.52f), PixelSize = new SizeF(70.45f, 91.77f), Degrees = -53.00f, OrientStart = new PointF(297.54f, 198.44f), OrientEnd = new PointF(282.67f, 222.12f) },
         };
 
         private static PointF[][][] boxes = new PointF[][][]
@@ -65,11 +65,11 @@ namespace Pool1984
         private static Dictionary<string, BallPosition> positions = new[]
         {
             new BallPosition { Name = "Ball 1", Target = "Ball 1", PixelCenter = new PointF(111.78f, 166.22f), PixelSize = new SizeF(175.02f, 176.32f), Degrees = -179.50f },
-            new BallPosition { Name = "Ball 9a", Target = "Ball 9", PixelCenter = new PointF(326.64f, 247.57f), PixelSize = new SizeF(173.11f, 176.89f), Degrees = -179.50f },
-            new BallPosition { Name = "Ball 9b", Target = "Ball 9", PixelCenter = new PointF(337.32f, 267.88f), PixelSize = new SizeF(173.11f, 176.89f), Degrees = -179.50f },
-            new BallPosition { Name = "Ball 9c", Target = "Ball 9", PixelCenter = new PointF(340.62f, 297.17f), PixelSize = new SizeF(173.11f, 176.89f), Degrees = -179.50f },
-            new BallPosition { Name = "Ball 8a", Target = "Ball 8", PixelCenter = new PointF(513.15f, 187.86f), PixelSize = new SizeF(171.81f, 176.67f), Degrees = 167.00f },
-            new BallPosition { Name = "Ball 8b", Target = "Ball 8", PixelCenter = new PointF(495.39f, 193.06f), PixelSize = new SizeF(171.81f, 176.67f), Degrees = 167.00f },
+            new BallPosition { Name = "Ball 9a", Target = "Ball 9", PixelCenter = new PointF(338.73f, 296.04f), PixelSize = new SizeF(169.32f, 175.37f), Degrees = 0.00f },
+            new BallPosition { Name = "Ball 9b", Target = "Ball 9", PixelCenter = new PointF(342.34f, 278.31f), PixelSize = new SizeF(169.32f, 175.37f), Degrees = 0.00f },
+            new BallPosition { Name = "Ball 9c", Target = "Ball 9", PixelCenter = new PointF(325.05f, 246.97f), PixelSize = new SizeF(169.32f, 175.37f), Degrees = 0.00f },
+            new BallPosition { Name = "Ball 8a", Target = "Ball 8", PixelCenter = new PointF(495.39f, 191.44f), PixelSize = new SizeF(169.89f, 172.91f), Degrees = 0.00f },
+            new BallPosition { Name = "Ball 8b", Target = "Ball 8", PixelCenter = new PointF(513.25f, 178.75f), PixelSize = new SizeF(169.89f, 172.91f), Degrees = 0.00f },
             new BallPosition { Name = "Ball 4a", Target = "Ball 4", PixelCenter = new PointF(676.31f, 123.41f), PixelSize = new SizeF(172.73f, 175.75f), Degrees = -179.70f },
             new BallPosition { Name = "Ball 4b", Target = "Ball 4", PixelCenter = new PointF(689.79f, 118.62f), PixelSize = new SizeF(172.73f, 175.75f), Degrees = -179.70f },
             new BallPosition { Name = "Ball wa", Target = "Ball w", PixelCenter = new PointF(295.17f, 550.50f), PixelSize = new SizeF(177.64f, 177.64f), Degrees = 0.00f },
@@ -109,11 +109,11 @@ namespace Pool1984
         // ColorRef areas are used for color calibration
         private static ColorRef[] colorRefs = new ColorRef[] {
             new ColorRef { PixelCenter = new PointF(573.58f, 456.55f), Radius = 56.42f }, // Lightest part of the cloth
-            new ColorRef { PixelCenter = new PointF(577.27f, 226.89f), Radius = 24.94f }, // Darkest part of the cloth (ambient color)
+            new ColorRef { PixelCenter = new PointF(609.13f, 214.47f), Radius = 24.94f }, // Darkest part of the cloth (ambient color)
             new ColorRef { PixelCenter = new PointF(86.20f, 287.82f), Radius = 35.91f }, // Cloth with shadow of lamp 1 (top)
             new ColorRef { PixelCenter = new PointF(398.50f, 575.20f), Radius = 20.52f }, // Cloth with shadow of lamp 2
             new ColorRef { PixelCenter = new PointF(444.56f, 449.02f), Radius = 30.99f }, // Cloth with shadow of lamp 3 (bottom)
-            new ColorRef { PixelCenter = new PointF(83.24f, 134.94f), Radius = 20.41f }, // Lightest part of Ball 1
+            new ColorRef { PixelCenter = new PointF(105.66f, 119.70f), Radius = 20.41f }, // Lightest part of Ball 1
             new ColorRef { PixelCenter = new PointF(709.32f, 99.04f), Radius = 20.41f }, // Lightest part of Ball 4
             new ColorRef { PixelCenter = new PointF(304.50f, 545.56f), Radius = 20.41f }, // Lightest part of Ball w
             new ColorRef { PixelCenter = new PointF(621.44f, 73.33f), Radius = 18.90f }, // Reflection of cloth in Ball 4
@@ -130,9 +130,9 @@ namespace Pool1984
         private static Keyframe[] keyframes = new Keyframe[] {
             new Keyframe { StartPosition = positions["Ball 1"], EndPosition = positions["Ball 1"], StartTime = 0.0, EndTime = 1.0 },
             new Keyframe { StartPosition = positions["Ball 4a"], EndPosition = positions["Ball 4b"], StartTime = 0.5, EndTime = 1.0 },
-            new Keyframe { StartPosition = positions["Ball 8b"], EndPosition = positions["Ball 8a"], StartTime = 0.4, EndTime = 0.6 },
-            new Keyframe { StartPosition = positions["Ball 9c"], EndPosition = positions["Ball 9b"], StartTime = 0.0, EndTime = 0.5 },
-            new Keyframe { StartPosition = positions["Ball 9b"], EndPosition = positions["Ball 9a"], StartTime = 0.5, EndTime = 1.0 },
+            new Keyframe { StartPosition = positions["Ball 8a"], EndPosition = positions["Ball 8b"], StartTime = 0.3, EndTime = 0.7 },
+            new Keyframe { StartPosition = positions["Ball 9a"], EndPosition = positions["Ball 9b"], StartTime = 0.0, EndTime = 0.5 },
+            new Keyframe { StartPosition = positions["Ball 9b"], EndPosition = positions["Ball 9c"], StartTime = 0.5, EndTime = 1.0 },
             new Keyframe { StartPosition = positions["Ball wa"], EndPosition = positions["Ball wb"], StartTime = 0.0, EndTime = 1.0 }
         };
 
@@ -292,7 +292,7 @@ namespace Pool1984
 
         private void RenderBox_Paint(object sender, PaintEventArgs e)
         {
-            var pens = new Pen[] { Pens.Red, Pens.Green, Pens.Yellow, Pens.Purple, Pens.Red, Pens.Green, Pens.Yellow };
+            var pens = new Pen[] { Pens.Red, Pens.Blue, Pens.Yellow, Pens.Purple, Pens.Red, Pens.Green, Pens.Yellow };
             for (int n = 0; n < pens.Length; n++)
                 pens[n] = new Pen(pens[n].Color, 0.1f);
 
@@ -644,8 +644,8 @@ namespace Pool1984
                         PointF pp1 = default(PointF);
                         for (int n = 0; n <= 90; n++)
                         {
-                            double angle1 = 0.5 * (ball.GetMinAngle1(time) + ball.GetMaxAngle1(time)) + 0.5 * (ball.GetMaxAngle1(time) - ball.GetMinAngle1(time)) * Math.Cos(n * Math.PI / 45.0);
-                            double angle2 = 0.5 * (ball.GetMinAngle2(time) + ball.GetMaxAngle2(time)) + 0.5 * (ball.GetMaxAngle2(time) - ball.GetMinAngle2(time)) * Math.Sin(n * Math.PI / 45.0);
+                            double angle1 = Ball.TextureAngle * Math.Cos(n * Math.PI / 45.0);
+                            double angle2 = Ball.TextureAngle * Math.Sin(n * Math.PI / 45.0);
                             Vector3 v = new Vector3(
                                 Math.Cos(angle1) * Math.Cos(angle2),
                                 Math.Sin(angle1) * Math.Cos(angle2),
@@ -653,6 +653,26 @@ namespace Pool1984
                             v = v * ball.GetTextureToWorld(time) + ball.GetCenter(time);
                             PointF pp2 = CoordToPixel(renderCamera.VertexToCoord(v));
                             if (n > 0)
+                                e.Graphics.DrawLine(pens[4], pp1, pp2);
+                            pp1 = pp2;
+                        }
+                        foreach (var arrowPoint in new[] {
+                            new PointF(-0.2f, 0.4f),
+                            new PointF(0.0f, 0.5f),
+                            new PointF(0.0f, -0.5f),
+                            new PointF(0.0f, 0.5f),
+                            new PointF(0.2f, 0.4f)
+                        }.Select((point, index) => new { point, index }))
+                        {
+                            double angle1 = Ball.TextureAngle * arrowPoint.point.X;
+                            double angle2 = Ball.TextureAngle * arrowPoint.point.Y;
+                            Vector3 v = new Vector3(
+                                Math.Cos(angle1) * Math.Cos(angle2),
+                                Math.Sin(angle1) * Math.Cos(angle2),
+                                Math.Sin(angle2));
+                            v = v * ball.GetTextureToWorld(time) + ball.GetCenter(time);
+                            PointF pp2 = CoordToPixel(renderCamera.VertexToCoord(v));
+                            if (arrowPoint.index != 0 && arrowPoint.index != 3)
                                 e.Graphics.DrawLine(pens[4], pp1, pp2);
                             pp1 = pp2;
                         }
@@ -1023,33 +1043,6 @@ namespace Pool1984
                     position.TextureOrientation = textureOrientation;
                     position.WorldToTexture = Matrix4.Rotate(textureOrientation);
                     position.TextureToWorld = Matrix4.AffineInvert(position.WorldToTexture);
-
-                    // Calculate angle range of texture
-                    double minAngle1 = 1E12, maxAngle1 = -1E12;
-                    double minAngle2 = 1E12, maxAngle2 = -1E12;
-                    foreach (var point in number.Ellipse.GetOutline(90))
-                    {
-                        // Calculate ray going through the ellipse points
-                        Vector2 px = PixelToCoord(point);
-                        ray = model.Camera.CoordToRay(px);
-
-                        // Calculate intersection with ball
-                        intsec = position.GetClosestIntersection(ray, IntersectionMode.PositionAndNormal);
-                        Vector3 transformedNormal = intsec.Normal * position.WorldToTexture;
-
-                        // After transformation, texture center should sit at angle1 = 0.0° and angle2 = 0.0°
-                        double angle1 = Math.Atan2(transformedNormal.Y, transformedNormal.X);
-                        double angle2 = Math.Atan2(transformedNormal.Z, new Vector2(transformedNormal.X, transformedNormal.Y).Length);
-                        if (angle1 < minAngle1) minAngle1 = angle1;
-                        if (angle1 > maxAngle1) maxAngle1 = angle1;
-                        if (angle2 < minAngle2) minAngle2 = angle2;
-                        if (angle2 > maxAngle2) maxAngle2 = angle2;
-                        sum += intsec.Normal;
-                    }
-                    position.MinAngle1 = minAngle1;
-                    position.MaxAngle1 = maxAngle1;
-                    position.MinAngle2 = minAngle2;
-                    position.MaxAngle2 = maxAngle2;
                 }
             }
             CalibrateColors();
@@ -1279,8 +1272,8 @@ namespace Pool1984
                     {
                         for (int x = 0; x < bmp.Width; x++)
                         {
-                            double angle1 = x * (position.MaxAngle1 - position.MinAngle1) / bmp.Width + position.MinAngle1;
-                            double angle2 = y * (position.MinAngle2 - position.MaxAngle2) / bmp.Height + position.MaxAngle2;
+                            double angle1 = 2.0 * x * Ball.TextureAngle / bmp.Width - Ball.TextureAngle;
+                            double angle2 = Ball.TextureAngle - 2.0 * y * Ball.TextureAngle / bmp.Height;
                             Vector3 v = new Vector3(
                                 Math.Cos(angle1) * Math.Cos(angle2),
                                 Math.Sin(angle1) * Math.Cos(angle2),

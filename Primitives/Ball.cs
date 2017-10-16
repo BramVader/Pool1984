@@ -9,12 +9,10 @@ namespace Pool1984
 {
     class Ball : Primitive
     {
+        public static double TextureAngle = 0.55;
+
         public Func<double, Vector3> GetCenter = d => new Vector3();
         public Func<double, Vector3> GetTextureOrientation = d => new Vector3();
-        public Func<double, double> GetMinAngle1 = d => 0.0;
-        public Func<double, double> GetMaxAngle1 = d => 0.0;
-        public Func<double, double> GetMinAngle2 = d => 0.0;
-        public Func<double, double> GetMaxAngle2 = d => 0.0;
 
         public double Radius { get; set; }
         public Color3 BandColor { get; set; }
@@ -80,14 +78,17 @@ namespace Pool1984
 
         public void ApplyKeyframes(IEnumerable<Keyframe> frames)
         {
+            double CorrectAngle (double a, double b)
+            {
+                while (b - a > Math.PI) b -= Math.PI * 2.0;
+                while (b - a < -Math.PI) b += Math.PI * 2.0;
+                return b;
+            };
+
             ParameterExpression tpar = Expression.Parameter(typeof(double), "t");
 
             Expression centerExpr = null;
             Expression rotationExpr = null;
-            Expression minAngle1Expr = null;
-            Expression maxAngle1Expr = null;
-            Expression minAngle2Expr = null;
-            Expression maxAngle2Expr = null;
             foreach (var keyframe in frames.Where(it => it.StartPosition.Ball == this).OrderBy(it => it.StartTime))
             {
                 // Interpolating position.Center over time
@@ -96,42 +97,20 @@ namespace Pool1984
                     keyframe.EndPosition.Center
                 );
 
+                Vector3 endOrientation = new Vector3(
+                    CorrectAngle(keyframe.StartPosition.TextureOrientation.X, keyframe.EndPosition.TextureOrientation.X),
+                    CorrectAngle(keyframe.StartPosition.TextureOrientation.Y, keyframe.EndPosition.TextureOrientation.Y),
+                    CorrectAngle(keyframe.StartPosition.TextureOrientation.Z, keyframe.EndPosition.TextureOrientation.Z)
+                );
+
                 // Interpolating textureOrientation over time
                 rotationExpr = BuildInterpolationExpression(tpar, rotationExpr, keyframe.StartTime, keyframe.EndTime, 
-                    keyframe.StartPosition.TextureOrientation, 
-                    keyframe.EndPosition.TextureOrientation
-                );
-
-                // Interpolating minAngle1 over time
-                minAngle1Expr = BuildInterpolationExpression(tpar, minAngle1Expr, keyframe.StartTime, keyframe.EndTime,
-                    keyframe.StartPosition.MinAngle1,
-                    keyframe.EndPosition.MinAngle1
-                );
-
-                // Interpolating minAngle1 over time
-                maxAngle1Expr = BuildInterpolationExpression(tpar, maxAngle1Expr, keyframe.StartTime, keyframe.EndTime,
-                    keyframe.StartPosition.MaxAngle1,
-                    keyframe.EndPosition.MaxAngle1
-                );
-
-                // Interpolating minAngle1 over time
-                minAngle2Expr = BuildInterpolationExpression(tpar, minAngle2Expr, keyframe.StartTime, keyframe.EndTime,
-                    keyframe.StartPosition.MinAngle2,
-                    keyframe.EndPosition.MinAngle2
-                );
-
-                // Interpolating minAngle1 over time
-                maxAngle2Expr = BuildInterpolationExpression(tpar, maxAngle2Expr, keyframe.StartTime, keyframe.EndTime,
-                    keyframe.StartPosition.MaxAngle2,
-                    keyframe.EndPosition.MaxAngle2
+                    keyframe.StartPosition.TextureOrientation,
+                    endOrientation
                 );
             }
             GetCenter = Expression.Lambda<Func<double, Vector3>>(centerExpr, tpar).Compile();
             GetTextureOrientation = Expression.Lambda<Func<double, Vector3>>(rotationExpr, tpar).Compile();
-            GetMinAngle1 = Expression.Lambda<Func<double, double>>(minAngle1Expr, tpar).Compile();
-            GetMaxAngle1 = Expression.Lambda<Func<double, double>>(maxAngle1Expr, tpar).Compile();
-            GetMinAngle2 = Expression.Lambda<Func<double, double>>(minAngle2Expr, tpar).Compile();
-            GetMaxAngle2 = Expression.Lambda<Func<double, double>>(maxAngle2Expr, tpar).Compile();
         }
 
         public Ball()
@@ -174,11 +153,10 @@ namespace Pool1984
 
         public override Vector2 GetTextureCoordinates(Vector3 transformedNormal, double time)
         {
-            double angle1 = Math.Atan2(transformedNormal.Y, transformedNormal.X);
-            double angle2 = Math.Atan2(transformedNormal.Z, new Vector2(transformedNormal.X, transformedNormal.Y).Length);
+            double angle1 = Math.Atan2(transformedNormal.Y, transformedNormal.X) / TextureAngle;
+            double angle2 = Math.Atan2(transformedNormal.Z, new Vector2(transformedNormal.X, transformedNormal.Y).Length) / TextureAngle;
             return new Vector2(
-                (angle1 - (GetMinAngle1(time) + GetMaxAngle1(time)) * 0.5) * 2.0 / (GetMaxAngle1(time) - GetMinAngle1(time)),
-                ((GetMinAngle2(time) + GetMaxAngle2(time)) * 0.5 - angle2) * 2.0 / (GetMaxAngle2(time) - GetMinAngle2(time))
+                angle1, -angle2
             );
         }
     }

@@ -19,10 +19,6 @@ namespace Pool1984
         // Calculated texture transformation + range
         public Matrix4 WorldToTexture { get; set; }
         public Matrix4 TextureToWorld { get; set; }
-        public double MinAngle1 { get; set; }
-        public double MaxAngle1 { get; set; }
-        public double MinAngle2 { get; set; }
-        public double MaxAngle2 { get; set; }
 
         // Original bitmap data
         public PointF PixelCenter { get; set; }
