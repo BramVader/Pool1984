@@ -11,25 +11,82 @@ namespace Pool1984
     {
         public static double TextureAngle = 0.55;
 
-        public Func<double, Vector3> GetCenter = d => new Vector3();
-        public Func<double, Vector3> GetTextureOrientation = d => new Vector3();
+        public Func<double, Vector3> GetCenter = t => new Vector3();
+        public Func<Vector3, double, Vector3> GetWorldToTextureTransformation = (v, t) => v;
+        public Func<Vector3, double, Vector3> GetTextureToWorldTransformation = (v, t) => v;
 
         public double Radius { get; set; }
         public Color3 BandColor { get; set; }
 
-        public override Matrix4 GetWorldToTexture(double time)
+        public Expression BuildMatrixInterpolation(ParameterExpression vpar, ParameterExpression tpar, double startTime, double endTime, Matrix4 a, Matrix4 b)
         {
-            return Matrix4.Rotate(GetTextureOrientation(time));
+            Func<int, Expression> getElement = n =>
+                n == 0 ? Expression.Property(vpar, "X") :
+                n == 1 ? Expression.Property(vpar, "Y") :
+                n == 2 ? Expression.Property(vpar, "Z") :
+                (Expression)null;
+
+            Expression[] args = new Expression[3];
+            for (int n = 0; n < 3; n++)
+            {
+                Expression expr1 = null;
+                for (int m = 0; m < 4; m++)
+                {
+                    Expression expr2 = getElement(m);
+                    if (a[m, n] == b[m, n])         // No interpolation needed
+                    {
+                        if (a[m, n] == 0.0)         // Multiply by zero: skip operation
+                        {
+                            expr2 = null;
+                        }
+                        else if (a[m, n] != 1.0)    // Non-zero coefficient
+                        {
+                            if (expr2 != null)
+                            {
+                                expr2 = Expression.Multiply(expr2, Expression.Constant(a[m, n]));
+                            }
+                            else
+                            {
+                                expr2 = Expression.Constant(a[m, n]);
+                            }
+                        }
+                    }
+                    else  // Interpolation required
+                    {
+                        Expression expr3 = BuildInterpolationExpression(tpar, startTime, endTime, a[m, n], b[m, n]);
+                        if (expr2 != null)
+                        {
+                            expr2 = Expression.Multiply(expr2, expr3);
+                        }
+                        else
+                        {
+                            expr2 = expr3;
+                        }
+                    }
+
+                    if (expr2 != null)
+                    {
+                        expr1 = expr1 == null ? expr2 : Expression.Add(expr1, expr2);
+                    }
+
+                    args[n] = expr1 ?? Expression.Constant(0.0);
+                }
+            }
+
+            return Expression.New(
+                typeof(Vector3).GetConstructors().Single(it => it.GetParameters().Length == 3),  // Get the Vector3 constructor with 3 parameters
+                args
+            );
         }
 
-        public override Matrix4 GetTextureToWorld(double time)
+        private Expression BuildInterpolationExpression<T>(ParameterExpression tpar, double startTime, double endTime, T startValue, T endValue)
         {
-            return Matrix4.RotateInv(GetTextureOrientation(time));
-        }
+            if (startValue.Equals(endValue))
+            {
+                return Expression.Constant(startValue);
+            }
 
-        private Expression BuildInterpolationExpression<T>(ParameterExpression tpar, Expression prevExpression, double startTime, double endTime, T startValue, T endValue)
-        {
-            // (time - startTime) * (endVector - startVector)
+            // (time - startTime) * (endValue - startValue)
             Expression exprA =
                 Expression.Multiply(
                     startTime > 0.0 ?
@@ -38,8 +95,8 @@ namespace Pool1984
                     Expression.Constant((T)((dynamic)endValue - (dynamic)startValue))
                 );
 
-            // startVector + (time - startTime) * (endVector - startVector) / (endTime - startTime)
-            Expression exprB =
+            // startValue + (time - startTime) * (endValue - startValue) / (endTime - startTime)
+            return
                 Expression.Add(
                         Expression.Constant(startValue),
                         endTime - startTime < 1.0 ?
@@ -49,68 +106,69 @@ namespace Pool1984
                             ) :
                             exprA
                     );
-
-            // time < endTime ? 
-            //    startVector + (time - startTime) * (endVector - startVector) / (endTime - startTime) :
-            //    endTime
-            Expression exprC = endTime < 1.0 ?
-                    Expression.Condition(
-                        Expression.LessThan(tpar, Expression.Constant(endTime)),
-                        exprB,
-                        Expression.Constant(endValue)
-                    ) :
-                    exprB;
-
-            // time < starTime ?
-            //    {prevExpression} ?? startVector :
-            //    time < endTime ? 
-            //       startVector + (time - startTime) * (endVector - startVector) / (endTime - startTime) :
-            //       endTime
-            return
-                startTime > 0.0 ?
-                Expression.Condition(
-                    Expression.LessThan(tpar, Expression.Constant(startTime)),
-                    prevExpression ?? Expression.Constant(startValue),
-                    exprC
-                ) :
-                exprC;
         }
 
         public void ApplyKeyframes(IEnumerable<Keyframe> frames)
         {
-            double CorrectAngle (double a, double b)
-            {
-                while (b - a > Math.PI) b -= Math.PI * 2.0;
-                while (b - a < -Math.PI) b += Math.PI * 2.0;
-                return b;
-            };
-
+            ParameterExpression vpar = Expression.Parameter(typeof(Vector3), "v");
             ParameterExpression tpar = Expression.Parameter(typeof(double), "t");
 
             Expression centerExpr = null;
-            Expression rotationExpr = null;
-            foreach (var keyframe in frames.Where(it => it.StartPosition.Ball == this).OrderBy(it => it.StartTime))
+            Expression textureToWorldTransformationExpr = null;
+            Expression worldToTextureTransformationExpr = null;
+            foreach (var keyframe in frames.Where(it => it.StartPosition.Ball == this).OrderByDescending(it => it.StartTime))
             {
+                Expression timeCheck =
+                    Expression.AndAlso(
+                        Expression.GreaterThanOrEqual(tpar, Expression.Constant(keyframe.StartTime)),
+                        Expression.LessThan(tpar, Expression.Constant(keyframe.EndTime))
+                    );
+
+                // Interpolating matrices over time
+                if (keyframe.StartPosition.TextureToWorld.Valid && keyframe.EndPosition.TextureToWorld.Valid)
+                {
+                    textureToWorldTransformationExpr = Expression.Condition(
+                        timeCheck,
+                        BuildMatrixInterpolation(vpar, tpar, keyframe.StartTime, keyframe.EndTime,
+                            keyframe.StartPosition.TextureToWorld,
+                            keyframe.EndPosition.TextureToWorld
+                        ),
+                        textureToWorldTransformationExpr ?? Expression.Constant(default(Vector3))
+                    );
+                }
+
+                if (keyframe.StartPosition.WorldToTexture.Valid && keyframe.EndPosition.WorldToTexture.Valid)
+                {
+                    worldToTextureTransformationExpr = Expression.Condition(
+                        timeCheck,
+                        BuildMatrixInterpolation(vpar, tpar, keyframe.StartTime, keyframe.EndTime,
+                            keyframe.StartPosition.WorldToTexture,
+                            keyframe.EndPosition.WorldToTexture
+                        ),
+                        worldToTextureTransformationExpr ?? Expression.Constant(default(Vector3))
+                    );
+                }
+
                 // Interpolating position.Center over time
-                centerExpr = BuildInterpolationExpression(tpar, centerExpr, keyframe.StartTime, keyframe.EndTime,
-                    keyframe.StartPosition.Center, 
-                    keyframe.EndPosition.Center
+                centerExpr = Expression.Condition(
+                    timeCheck,
+                    BuildInterpolationExpression(tpar, keyframe.StartTime, keyframe.EndTime,
+                        keyframe.StartPosition.Center,
+                        keyframe.EndPosition.Center
+                    ),
+                    centerExpr ?? Expression.Constant(default(Vector3))
                 );
 
-                Vector3 endOrientation = new Vector3(
-                    CorrectAngle(keyframe.StartPosition.TextureOrientation.X, keyframe.EndPosition.TextureOrientation.X),
-                    CorrectAngle(keyframe.StartPosition.TextureOrientation.Y, keyframe.EndPosition.TextureOrientation.Y),
-                    CorrectAngle(keyframe.StartPosition.TextureOrientation.Z, keyframe.EndPosition.TextureOrientation.Z)
-                );
-
-                // Interpolating textureOrientation over time
-                rotationExpr = BuildInterpolationExpression(tpar, rotationExpr, keyframe.StartTime, keyframe.EndTime, 
-                    keyframe.StartPosition.TextureOrientation,
-                    endOrientation
-                );
             }
             GetCenter = Expression.Lambda<Func<double, Vector3>>(centerExpr, tpar).Compile();
-            GetTextureOrientation = Expression.Lambda<Func<double, Vector3>>(rotationExpr, tpar).Compile();
+            GetTextureToWorldTransformation =
+                textureToWorldTransformationExpr != null ?
+                Expression.Lambda<Func<Vector3, double, Vector3>>(textureToWorldTransformationExpr, vpar, tpar).Compile() :
+                (v, t) => v;
+            GetWorldToTextureTransformation =
+                worldToTextureTransformationExpr != null ?
+                Expression.Lambda<Func<Vector3, double, Vector3>>(worldToTextureTransformationExpr, vpar, tpar).Compile() :
+                (v, t) => v;
         }
 
         public Ball()

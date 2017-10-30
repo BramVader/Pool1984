@@ -119,19 +119,19 @@ namespace Pool1984
                     }
                     else
                     {
-                        Vector3 transformedNormal = closest.Normal * primitive.GetWorldToTexture(time);
-                        Vector2 p = primitive.GetTextureCoordinates(transformedNormal, time);
-                        if (p.Length < 1.0)
+                        if (primitive is Ball ball)
                         {
-                            Point q = new Point(
-                                (int)((p.X * 0.5 + 0.5) * primitive.Texture.Width),
-                                (int)((p.Y * 0.5 + 0.5) * primitive.Texture.Height)
-                            );
-                            diffuseColor = primitive.Texture[q.X, q.Y];
-                        }
-                        else
-                        {
-                            if (primitive is Ball ball)
+                            Vector3 transformedNormal = ball.GetWorldToTextureTransformation(closest.Normal, time);
+                            Vector2 p = primitive.GetTextureCoordinates(transformedNormal, time);
+                            if (p.Length < 1.0)
+                            {
+                                Point q = new Point(
+                                    (int)((p.X * 0.5 + 0.5) * primitive.Texture.Width),
+                                    (int)((p.Y * 0.5 + 0.5) * primitive.Texture.Height)
+                                );
+                                diffuseColor = primitive.Texture[q.X, q.Y];
+                            }
+                            else
                             {
                                 if (Math.Abs(transformedNormal.X) < 0.5)
                                 {

@@ -39,14 +39,5 @@ namespace Pool1984
             throw new NotImplementedException();
         }
 
-        public override Matrix4 GetWorldToTexture(double time)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Matrix4 GetTextureToWorld(double time)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

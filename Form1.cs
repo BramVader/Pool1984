@@ -1,14 +1,13 @@
-﻿using System;
-using System.Linq;
+﻿using Pool1984.Properties;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Threading;
-using System.Diagnostics;
-using Pool1984.Properties;
-using System.IO;
 
 namespace Pool1984
 {
@@ -129,10 +128,17 @@ namespace Pool1984
         // the room are motion blurred, as are the penumbras.
         private static Keyframe[] keyframes = new Keyframe[] {
             new Keyframe { StartPosition = positions["Ball 1"], EndPosition = positions["Ball 1"], StartTime = 0.0, EndTime = 1.0 },
-            new Keyframe { StartPosition = positions["Ball 4a"], EndPosition = positions["Ball 4b"], StartTime = 0.5, EndTime = 1.0 },
-            new Keyframe { StartPosition = positions["Ball 8a"], EndPosition = positions["Ball 8b"], StartTime = 0.3, EndTime = 0.7 },
+
             new Keyframe { StartPosition = positions["Ball 9a"], EndPosition = positions["Ball 9b"], StartTime = 0.0, EndTime = 0.5 },
             new Keyframe { StartPosition = positions["Ball 9b"], EndPosition = positions["Ball 9c"], StartTime = 0.5, EndTime = 1.0 },
+
+            new Keyframe { StartPosition = positions["Ball 4a"], EndPosition = positions["Ball 4a"], StartTime = 0.0, EndTime = 0.5 },
+            new Keyframe { StartPosition = positions["Ball 4a"], EndPosition = positions["Ball 4b"], StartTime = 0.5, EndTime = 1.0 },
+
+            new Keyframe { StartPosition = positions["Ball 8a"], EndPosition = positions["Ball 8a"], StartTime = 0.0, EndTime = 0.3 },
+            new Keyframe { StartPosition = positions["Ball 8a"], EndPosition = positions["Ball 8b"], StartTime = 0.3, EndTime = 0.7 },
+            new Keyframe { StartPosition = positions["Ball 8b"], EndPosition = positions["Ball 8b"], StartTime = 0.7, EndTime = 1.0 },
+
             new Keyframe { StartPosition = positions["Ball wa"], EndPosition = positions["Ball wb"], StartTime = 0.0, EndTime = 1.0 }
         };
 
@@ -476,10 +482,11 @@ namespace Pool1984
                             p1 = default(Vector3);
                             for (int m = 0; m <= 90; m++)
                             {
-                                p2 = ball.GetCenter(time) + new Vector3(
+                                p2 = new Vector3(
                                    radius * Math.Cos(m * Math.PI / 45.0),
                                    radius * Math.Sin(m * Math.PI / 45.0),
                                    Math.Sin(n * Math.PI / 180.0));
+                                p2 = ball.GetTextureToWorldTransformation(p2, time) + ball.GetCenter(time);
                                 if (m > 0)
                                     e.Graphics.DrawLine(pen, CoordToPixel(renderCamera.VertexToCoord(p1)), CoordToPixel(renderCamera.VertexToCoord(p2)));
                                 p1 = p2;
@@ -491,10 +498,11 @@ namespace Pool1984
                             p1 = default(Vector3);
                             for (int n = -90; n <= 90; n += 10)
                             {
-                                p2 = ball.GetCenter(time) + new Vector3(
+                                p2 = new Vector3(
                                     Math.Cos(m * Math.PI / 8.0) * Math.Cos(n * Math.PI / 180.0),
                                     Math.Sin(m * Math.PI / 8.0) * Math.Cos(n * Math.PI / 180.0),
                                     Math.Sin(n * Math.PI / 180.0));
+                                p2 = ball.GetTextureToWorldTransformation(p2, time) + ball.GetCenter(time);
                                 if (n > -90)
                                     e.Graphics.DrawLine(pen, CoordToPixel(renderCamera.VertexToCoord(p1)), CoordToPixel(renderCamera.VertexToCoord(p2)));
                                 p1 = p2;
@@ -650,7 +658,7 @@ namespace Pool1984
                                 Math.Cos(angle1) * Math.Cos(angle2),
                                 Math.Sin(angle1) * Math.Cos(angle2),
                                 Math.Sin(angle2));
-                            v = v * ball.GetTextureToWorld(time) + ball.GetCenter(time);
+                            v = ball.GetTextureToWorldTransformation(v, time) + ball.GetCenter(time);
                             PointF pp2 = CoordToPixel(renderCamera.VertexToCoord(v));
                             if (n > 0)
                                 e.Graphics.DrawLine(pens[4], pp1, pp2);
@@ -670,7 +678,7 @@ namespace Pool1984
                                 Math.Cos(angle1) * Math.Cos(angle2),
                                 Math.Sin(angle1) * Math.Cos(angle2),
                                 Math.Sin(angle2));
-                            v = v * ball.GetTextureToWorld(time) + ball.GetCenter(time);
+                            v = ball.GetTextureToWorldTransformation(v, time) + ball.GetCenter(time);
                             PointF pp2 = CoordToPixel(renderCamera.VertexToCoord(v));
                             if (arrowPoint.index != 0 && arrowPoint.index != 3)
                                 e.Graphics.DrawLine(pens[4], pp1, pp2);
@@ -678,6 +686,7 @@ namespace Pool1984
                         }
                     }
                 }
+
             }
 
             if (!ViewEnabledCheckbox.Checked)

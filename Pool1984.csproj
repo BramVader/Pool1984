@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Math\Quaternion.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="Models\ColorRef.cs" />
     <Compile Include="Controls\ValueSetter.cs">
