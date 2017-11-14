@@ -48,6 +48,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exporters\Exporter.cs" />
+    <Compile Include="Exporters\ShaderToyExporter.cs" />
     <Compile Include="Math\Quaternion.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="Models\ColorRef.cs" />

@@ -9,7 +9,8 @@ namespace Pool1984
 {
     class Number
     {
-        public string Target { get; set; }
+        public string TargetPosition { get; set; }
+        public BallPosition Position { get; set; }
 
         public PointF PixelCenter { get; set; }
         public SizeF PixelSize { get; set; }

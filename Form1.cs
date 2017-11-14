@@ -1,10 +1,14 @@
-﻿using Pool1984.Properties;
+﻿using Pool1984.Exporters;
+using Pool1984.Properties;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,14 +26,10 @@ namespace Pool1984
 
         private static Number[] numbers = new Number[]
         {
-            new Number { Target = "Ball 1", PixelCenter = new PointF(124.72f, 175.53f), PixelSize = new SizeF(90.68f, 95.44f), Degrees = -24.00f, OrientStart = new PointF(127.38f, 201.46f), OrientEnd = new PointF(138.72f, 156.11f) },
-            new Number { Target = "Ball 4a", PixelCenter = new PointF(641.06f, 154.74f), PixelSize = new SizeF(74.17f, 93.62f), Degrees = 41.30f, OrientStart = new PointF(653.94f, 144.58f), OrientEnd = new PointF(644.95f, 184.83f) },
-            new Number { Target = "Ball 4b", PixelCenter = new PointF(665.06f, 142.90f), PixelSize = new SizeF(81.02f, 93.51f), Degrees = 28.00f, OrientStart = new PointF(653.94f, 144.58f), OrientEnd = new PointF(644.95f, 184.83f) },
-            new Number { Target = "Ball 8a", PixelCenter = new PointF(486.89f, 205.26f), PixelSize = new SizeF(92.53f, 94.44f), Degrees = -4.80f, OrientStart = new PointF(498.23f, 189.74f), OrientEnd = new PointF(473.28f, 225.27f) },
-            new Number { Target = "Ball 8b", PixelCenter = new PointF(520.97f, 181.08f), PixelSize = new SizeF(98.21f, 93.10f), Degrees = 96.00f, OrientStart = new PointF(534.89f, 163.29f), OrientEnd = new PointF(510.13f, 199.19f) },
-            new Number { Target = "Ball 9a", PixelCenter = new PointF(325.66f, 302.37f), PixelSize = new SizeF(90.68f, 84.29f), Degrees = -12.00f, OrientStart = new PointF(339.87f, 292.17f), OrientEnd = new PointF(315.93f, 308.80f) },
-            new Number { Target = "Ball 9b", PixelCenter = new PointF(330.18f, 279.10f), PixelSize = new SizeF(90.68f, 95.44f), Degrees = -24.00f, OrientStart = new PointF(342.89f, 246.81f), OrientEnd = new PointF(320.21f, 269.24f) },
-            new Number { Target = "Ball 9c", PixelCenter = new PointF(291.46f, 214.52f), PixelSize = new SizeF(70.45f, 91.77f), Degrees = -53.00f, OrientStart = new PointF(297.54f, 198.44f), OrientEnd = new PointF(282.67f, 222.12f) },
+            new Number { TargetPosition = "Ball 1", PixelCenter = new PointF(124.72f, 175.53f), PixelSize = new SizeF(90.68f, 95.44f), Degrees = -24.00f, OrientStart = new PointF(127.38f, 201.46f), OrientEnd = new PointF(138.72f, 156.11f) },
+            new Number { TargetPosition = "Ball 4a", PixelCenter = new PointF(641.06f, 154.74f), PixelSize = new SizeF(74.17f, 93.62f), Degrees = 41.30f, OrientStart = new PointF(653.94f, 144.58f), OrientEnd = new PointF(644.95f, 184.83f) },
+            new Number { TargetPosition = "Ball 8a", PixelCenter = new PointF(486.89f, 205.26f), PixelSize = new SizeF(92.53f, 94.44f), Degrees = -4.80f, OrientStart = new PointF(498.23f, 189.74f), OrientEnd = new PointF(473.28f, 225.27f) },
+            new Number { TargetPosition = "Ball 9c", PixelCenter = new PointF(291.46f, 214.52f), PixelSize = new SizeF(70.45f, 91.77f), Degrees = -53.00f, OrientStart = new PointF(297.54f, 198.44f), OrientEnd = new PointF(282.67f, 222.12f) },
         };
 
         private static PointF[][][] boxes = new PointF[][][]
@@ -63,16 +63,16 @@ namespace Pool1984
 
         private static Dictionary<string, BallPosition> positions = new[]
         {
-            new BallPosition { Name = "Ball 1", Target = "Ball 1", PixelCenter = new PointF(111.78f, 166.22f), PixelSize = new SizeF(175.02f, 176.32f), Degrees = -179.50f },
-            new BallPosition { Name = "Ball 9a", Target = "Ball 9", PixelCenter = new PointF(338.73f, 296.04f), PixelSize = new SizeF(169.32f, 175.37f), Degrees = 0.00f },
-            new BallPosition { Name = "Ball 9b", Target = "Ball 9", PixelCenter = new PointF(342.34f, 278.31f), PixelSize = new SizeF(169.32f, 175.37f), Degrees = 0.00f },
-            new BallPosition { Name = "Ball 9c", Target = "Ball 9", PixelCenter = new PointF(325.05f, 246.97f), PixelSize = new SizeF(169.32f, 175.37f), Degrees = 0.00f },
-            new BallPosition { Name = "Ball 8a", Target = "Ball 8", PixelCenter = new PointF(495.39f, 191.44f), PixelSize = new SizeF(169.89f, 172.91f), Degrees = 0.00f },
-            new BallPosition { Name = "Ball 8b", Target = "Ball 8", PixelCenter = new PointF(513.25f, 178.75f), PixelSize = new SizeF(169.89f, 172.91f), Degrees = 0.00f },
-            new BallPosition { Name = "Ball 4a", Target = "Ball 4", PixelCenter = new PointF(676.31f, 123.41f), PixelSize = new SizeF(172.73f, 175.75f), Degrees = -179.70f },
-            new BallPosition { Name = "Ball 4b", Target = "Ball 4", PixelCenter = new PointF(689.79f, 118.62f), PixelSize = new SizeF(172.73f, 175.75f), Degrees = -179.70f },
-            new BallPosition { Name = "Ball wa", Target = "Ball w", PixelCenter = new PointF(295.17f, 550.50f), PixelSize = new SizeF(177.64f, 177.64f), Degrees = 0.00f },
-            new BallPosition { Name = "Ball wb", Target = "Ball w", PixelCenter = new PointF(287.61f, 548.14f), PixelSize = new SizeF(177.64f, 177.64f), Degrees = 0.00f },
+            new BallPosition { Name = "Ball 1", TargetBall = "Ball 1", PixelCenter = new PointF(111.78f, 166.22f), PixelSize = new SizeF(175.02f, 176.32f), Degrees = -179.50f },
+            new BallPosition { Name = "Ball 9a", TargetBall = "Ball 9", PixelCenter = new PointF(338.73f, 296.04f), PixelSize = new SizeF(169.32f, 175.37f), Degrees = 0.00f },
+            new BallPosition { Name = "Ball 9b", TargetBall = "Ball 9", PixelCenter = new PointF(342.34f, 278.31f), PixelSize = new SizeF(169.32f, 175.37f), Degrees = 0.00f },
+            new BallPosition { Name = "Ball 9c", TargetBall = "Ball 9", PixelCenter = new PointF(325.05f, 246.97f), PixelSize = new SizeF(169.32f, 175.37f), Degrees = 0.00f },
+            new BallPosition { Name = "Ball 8a", TargetBall = "Ball 8", PixelCenter = new PointF(495.39f, 191.44f), PixelSize = new SizeF(169.89f, 172.91f), Degrees = 0.00f },
+            new BallPosition { Name = "Ball 8b", TargetBall = "Ball 8", PixelCenter = new PointF(513.25f, 178.75f), PixelSize = new SizeF(169.89f, 172.91f), Degrees = 0.00f },
+            new BallPosition { Name = "Ball 4a", TargetBall = "Ball 4", PixelCenter = new PointF(676.31f, 123.41f), PixelSize = new SizeF(172.73f, 175.75f), Degrees = -179.70f },
+            new BallPosition { Name = "Ball 4b", TargetBall = "Ball 4", PixelCenter = new PointF(689.79f, 118.62f), PixelSize = new SizeF(172.73f, 175.75f), Degrees = -179.70f },
+            new BallPosition { Name = "Ball wa", TargetBall = "Ball w", PixelCenter = new PointF(295.17f, 550.50f), PixelSize = new SizeF(177.64f, 177.64f), Degrees = 0.00f },
+            new BallPosition { Name = "Ball wb", TargetBall = "Ball w", PixelCenter = new PointF(287.61f, 548.14f), PixelSize = new SizeF(177.64f, 177.64f), Degrees = 0.00f },
         }.ToDictionary(it => it.Name);
 
         private static Light[] lights = new Light[]
@@ -81,8 +81,8 @@ namespace Pool1984
             {
                 Spots = new Light.Spot[]
                 {
-                    new Light.Spot { Target = "Ball 1", PixelCenter = new PointF(78.76f, 197.04f), PixelSize1 = new SizeF(3.75f, 5.14f), PixelSize2 = new SizeF(6.62f, 9.12f), Degrees = 40f },
-                    new Light.Spot { Target = "Ball 4a", PixelCenter = new PointF(645.37f, 151.28f), PixelSize1 = new SizeF(4.38f, 5.85f), PixelSize2 = new SizeF(6.98f, 8.64f), Degrees = 60f },
+                    new Light.Spot { TargetPosition = "Ball 1", PixelCenter = new PointF(78.76f, 197.04f), PixelSize1 = new SizeF(3.75f, 5.14f), PixelSize2 = new SizeF(6.62f, 9.12f), Degrees = 40f },
+                    new Light.Spot { TargetPosition = "Ball 4a", PixelCenter = new PointF(645.37f, 151.28f), PixelSize1 = new SizeF(4.38f, 5.85f), PixelSize2 = new SizeF(6.98f, 8.64f), Degrees = 60f },
                 }
             },
 
@@ -90,8 +90,8 @@ namespace Pool1984
             {
                 Spots = new Light.Spot[]
                 {
-                    new Light.Spot { Target = "Ball 1", PixelCenter = new PointF(89.39f, 168.44f), PixelSize1 = new SizeF(11.17f, 10.74f), PixelSize2 = new SizeF(13.96f, 13.86f), Degrees = 60f },
-                    new Light.Spot { Target = "Ball 4a", PixelCenter = new PointF(655.59f, 125.47f), PixelSize1 = new SizeF(10.02f, 9.31f), PixelSize2 = new SizeF(12.83f, 12.11f), Degrees = 62.1f },
+                    new Light.Spot { TargetPosition = "Ball 1", PixelCenter = new PointF(89.39f, 168.44f), PixelSize1 = new SizeF(11.17f, 10.74f), PixelSize2 = new SizeF(13.96f, 13.86f), Degrees = 60f },
+                    new Light.Spot { TargetPosition = "Ball 4a", PixelCenter = new PointF(655.59f, 125.47f), PixelSize1 = new SizeF(10.02f, 9.31f), PixelSize2 = new SizeF(12.83f, 12.11f), Degrees = 62.1f },
                 }
             },
 
@@ -99,8 +99,8 @@ namespace Pool1984
             {
                 Spots = new Light.Spot[]
                 {
-                    new Light.Spot { Target = "Ball 1", PixelCenter = new PointF(120.31f, 129.81f), PixelSize1 = new SizeF(7.31f, 8.84f), PixelSize2 = new SizeF(9.97f, 11.56f), Degrees = 75f },
-                    new Light.Spot { Target = "Ball 4a", PixelCenter = new PointF(683.08f, 85.47f), PixelSize1 = new SizeF(8.22f, 10.21f), PixelSize2 = new SizeF(10.37f, 12.35f), Degrees = 80f },
+                    new Light.Spot { TargetPosition = "Ball 1", PixelCenter = new PointF(120.31f, 129.81f), PixelSize1 = new SizeF(7.31f, 8.84f), PixelSize2 = new SizeF(9.97f, 11.56f), Degrees = 75f },
+                    new Light.Spot { TargetPosition = "Ball 4a", PixelCenter = new PointF(683.08f, 85.47f), PixelSize1 = new SizeF(8.22f, 10.21f), PixelSize2 = new SizeF(10.37f, 12.35f), Degrees = 80f },
                 }
             }
         };
@@ -127,18 +127,11 @@ namespace Pool1984
         // table; this most apparent in the stationary 1 ball. The reflections of the billiard balls and
         // the room are motion blurred, as are the penumbras.
         private static Keyframe[] keyframes = new Keyframe[] {
-            new Keyframe { StartPosition = positions["Ball 1"], EndPosition = positions["Ball 1"], StartTime = 0.0, EndTime = 1.0 },
-
+            new Keyframe { StartPosition = positions["Ball 1"],  EndPosition = positions["Ball 1"],  StartTime = 0.0, EndTime = 1.0 },
             new Keyframe { StartPosition = positions["Ball 9a"], EndPosition = positions["Ball 9b"], StartTime = 0.0, EndTime = 0.5 },
             new Keyframe { StartPosition = positions["Ball 9b"], EndPosition = positions["Ball 9c"], StartTime = 0.5, EndTime = 1.0 },
-
-            new Keyframe { StartPosition = positions["Ball 4a"], EndPosition = positions["Ball 4a"], StartTime = 0.0, EndTime = 0.5 },
             new Keyframe { StartPosition = positions["Ball 4a"], EndPosition = positions["Ball 4b"], StartTime = 0.5, EndTime = 1.0 },
-
-            new Keyframe { StartPosition = positions["Ball 8a"], EndPosition = positions["Ball 8a"], StartTime = 0.0, EndTime = 0.3 },
             new Keyframe { StartPosition = positions["Ball 8a"], EndPosition = positions["Ball 8b"], StartTime = 0.3, EndTime = 0.7 },
-            new Keyframe { StartPosition = positions["Ball 8b"], EndPosition = positions["Ball 8b"], StartTime = 0.7, EndTime = 1.0 },
-
             new Keyframe { StartPosition = positions["Ball wa"], EndPosition = positions["Ball wb"], StartTime = 0.0, EndTime = 1.0 }
         };
 
@@ -151,6 +144,7 @@ namespace Pool1984
         private Model model;
         private Camera viewCamera;
         private Dictionary<string, Primitive> primitives;
+        private Dictionary<string, Ball> balls;
 
         private Vector3[] pictureRect = new Vector3[4];
         private float pictureScale = 1f;
@@ -165,6 +159,8 @@ namespace Pool1984
 
         public Form1()
         {
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+
             InitializeComponent();
 
             picture = RenderBox.Image as Bitmap;
@@ -227,16 +223,18 @@ namespace Pool1984
                     Texture = Texture.FromBitmap(Resources.Cloth)
                 }
             }.ToDictionary(it => it.Name);
+            balls = primitives.Values.OfType<Ball>().ToDictionary(it => it.Name);
 
             // Connect entities
             foreach (var number in numbers)
             {
-                positions[number.Target].Number = number;
+                number.Position = positions[number.TargetPosition];
+                balls[number.Position.TargetBall].Number = number;
             }
 
             foreach (var position in positions.Values)
             {
-                position.Ball = primitives[position.Target] as Ball;
+                position.Ball = balls[position.TargetBall];
             }
 
             // For obtaining original cube map texture
@@ -246,9 +244,10 @@ namespace Pool1984
             positions["Ball 4a"].CubeMap = new Bitmap(textureSize * 4, textureSize, PixelFormat.Format24bppRgb);
 
             // For obtaining original number texture
-            positions["Ball 1"].SphereMap = new Bitmap(textureSize, textureSize, PixelFormat.Format24bppRgb);
-            positions["Ball 4a"].SphereMap = new Bitmap(textureSize, textureSize, PixelFormat.Format24bppRgb);
-            positions["Ball 8b"].SphereMap = new Bitmap(textureSize, textureSize, PixelFormat.Format24bppRgb);
+            balls["Ball 1"].SphereMap = new Bitmap(textureSize, textureSize, PixelFormat.Format24bppRgb);
+            balls["Ball 9"].SphereMap = new Bitmap(textureSize, textureSize, PixelFormat.Format24bppRgb);
+            balls["Ball 8"].SphereMap = new Bitmap(textureSize, textureSize, PixelFormat.Format24bppRgb);
+            balls["Ball 4"].SphereMap = new Bitmap(textureSize, textureSize, PixelFormat.Format24bppRgb);
 
             renderBitmap = new Bitmap((int)pictureWidth, (int)pictureHeight, PixelFormat.Format24bppRgb);
             RenderBox.Image = null;
@@ -276,8 +275,17 @@ namespace Pool1984
             ViewDistanceSetter.Value = 600.0;
 
             CalcScene();
-
             this.MouseWheel += Form1_MouseWheel;
+
+            var exporters = Assembly.GetExecutingAssembly().GetTypes().Where(it => typeof(Exporter).IsAssignableFrom(it) && !it.IsAbstract);
+            ExportersCombo.Format += (s, e) => { e.Value = (e.ListItem as Type).Name.Replace("Exporter", ""); };
+            ExportersCombo.DataSource = exporters.ToList();
+
+            //using (var ms = new MemoryStream())
+            //{
+            //    new ShaderToyExporter().Export(ms, model);
+            //    string result = Encoding.UTF8.GetString(ms.ToArray());
+            //}
         }
 
         private PointF CoordToPixel(Vector2 coord)
@@ -378,9 +386,9 @@ namespace Pool1984
                 if (ViewNumbersFlatCheckBox.Checked)
                 {
                     // Draw numbers flat
-                    foreach (var position in positions.Values)
+                    foreach (var ball in balls.Values)
                     {
-                        var number = position.Number;
+                        var number = ball.Number;
                         if (number != null)
                         {
                             PointF pp1 = default(PointF);
@@ -529,6 +537,10 @@ namespace Pool1984
                                 e.Graphics.DrawLine(pen, CoordToPixel(renderCamera.VertexToCoord(p1)), CoordToPixel(renderCamera.VertexToCoord(p2)));
                             p1 = p2;
                         }
+                        string st = position.Name;
+                        PointF center = CoordToPixel(renderCamera.VertexToCoord(position.Center));
+                        SizeF size = e.Graphics.MeasureString(st, Font);
+                        e.Graphics.DrawString(st, Font, Brushes.Black, new PointF(center.X - size.Width * 0.5f, center.Y - size.Height * 0.5f));
                     }
                 }
             }
@@ -643,10 +655,9 @@ namespace Pool1984
             if (ViewNumbers3DCheckBox.Checked)
             {
                 // Draw numbers
-                foreach (var position in positions.Values)
+                foreach (var ball in balls.Values)
                 {
-                    var number = position.Number;
-                    var ball = primitives[position.Target] as Ball;
+                    var number = ball.Number;
                     if (number != null)
                     {
                         PointF pp1 = default(PointF);
@@ -687,6 +698,30 @@ namespace Pool1984
                     }
                 }
 
+                // Calculate center of ball Number texture
+                foreach (var ball in balls.Values)
+                {
+                    var number = ball.Number;
+                    if (number != null)
+                    {
+                        var position = number.Position;
+
+                        Ray ray = default(Ray);
+                        Intersection intsec = default(Intersection);
+
+                        foreach (var point in number.Ellipse.GetOutline(16))
+                        {
+                            // Calculate ray going through the ellipse points
+                            Vector2 px = PixelToCoord(point);
+                            ray = model.Camera.CoordToRay(px);
+
+                            // Calculate intersection with ball
+                            intsec = position.GetClosestIntersection(ray, IntersectionMode.PositionAndNormal);
+                            e.Graphics.DrawEllipse(intsec.Hit ? Pens.Green : Pens.Red, point.X - 2f, point.Y - 2f, 4f, 4f);
+                        }
+
+                    }
+                }
             }
 
             if (!ViewEnabledCheckbox.Checked)
@@ -707,11 +742,13 @@ namespace Pool1984
 
             PointF cubemapOffset = new PointF(textureSize + 30f, 0f);
 
-            BallPosition selectedBall = positions[CubeMapContextActiveCubeMap.SelectedItem.ToString()];
+            BallPosition selectedPosition = positions[CubeMapContextActiveCubeMap.SelectedItem.ToString()];
+            Ball selectedBall = selectedPosition.Ball;
+
             if (selectedBall.SphereMap != null)
                 e.Graphics.DrawImage(selectedBall.SphereMap, 0f, 0f);
-            if (selectedBall.CubeMap != null)
-                e.Graphics.DrawImage(selectedBall.CubeMap, cubemapOffset);
+            if (selectedPosition.CubeMap != null)
+                e.Graphics.DrawImage(selectedPosition.CubeMap, cubemapOffset);
 
             // Draw lines from balls to reflected boxes
             if (ViewBoxesCheckbox.Checked)
@@ -934,7 +971,7 @@ namespace Pool1984
                 var light = lights[lightNr];
                 foreach (var spot in light.Spots)
                 {
-                    BallPosition position = positions[spot.Target];
+                    BallPosition position = positions[spot.TargetPosition];
                     Vector3 sum = new Vector3();
                     foreach (var point in spot.InnerEllipse.GetOutline(16))
                     {
@@ -963,7 +1000,7 @@ namespace Pool1984
                 var light = lights[lightNr];
                 foreach (var spot in light.Spots)
                 {
-                    BallPosition position = positions[spot.Target];
+                    BallPosition position = positions[spot.TargetPosition];
                     for (int m = 0; m < 2; m++)
                     {
                         Ellipse ellipse = m == 0 ? spot.InnerEllipse : spot.OuterEllipse;
@@ -1006,12 +1043,13 @@ namespace Pool1984
             }
 
             // Calculate center of ball Number texture
-            foreach (var position in positions.Values)
+            foreach (var ball in balls.Values)
             {
-                var number = position.Number;
+                var number = ball.Number;
                 if (number != null)
                 {
-                    var ball = position.Ball;
+                    var position = number.Position;
+
                     Ray ray = default(Ray);
                     Intersection intsec = default(Intersection);
 
@@ -1025,7 +1063,13 @@ namespace Pool1984
 
                         // Calculate intersection with ball
                         intsec = position.GetClosestIntersection(ray, IntersectionMode.PositionAndNormal);
-                        sum += intsec.Normal;
+                        if (intsec.Hit)
+                        {
+                            sum += intsec.Normal;
+                        }
+                        else
+                        {
+                        }
                     }
                     Vector3 center = sum.Normalize();
 
@@ -1266,10 +1310,11 @@ namespace Pool1984
         // Sphere maps
         private void CalculateSphereMaps()
         {
-            foreach (BallPosition position in positions.Values)
+            foreach (Number number in numbers)
             {
-                Bitmap bmp = position.SphereMap;
-                Number number = position.Number;
+                BallPosition position = number.Position;
+                Ball ball = position.Ball;
+                Bitmap bmp = ball.SphereMap;
                 if (number != null && bmp != null)
                 {
                     // Writing to sphere map
@@ -1340,9 +1385,9 @@ namespace Pool1984
         {
             if (CubeMapContextActiveCubeMap.SelectedIndex > -1)
             {
-                BallPosition position = positions[CubeMapContextActiveCubeMap.SelectedItem.ToString()];
-                if (position.SphereMap != null)
-                    Clipboard.SetImage(position.SphereMap);
+                Ball ball = balls[CubeMapContextActiveCubeMap.SelectedItem.ToString()];
+                if (ball.SphereMap != null)
+                    Clipboard.SetImage(ball.SphereMap);
             }
         }
 
@@ -1427,6 +1472,24 @@ namespace Pool1984
                 using (var s = new FileStream(SaveRenderingDialog.FileName, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
                     renderBitmap.Save(s, ImageFormat.Png);
+                }
+            }
+        }
+
+        private void ExportButton_Click(object sender, EventArgs e)
+        {
+            Type exporterType = ExportersCombo.SelectedItem as Type;
+            if (exporterType != null)
+            {
+                var exporter = (Exporter)Activator.CreateInstance(exporterType);
+                ExportDialog.DefaultExt = exporter.GetFileDialogFilter().Split('|')[1];
+                ExportDialog.Filter = exporter.GetFileDialogFilter();
+                if (ExportDialog.ShowDialog() == DialogResult.OK)
+                {
+                    using (var stream = new FileStream(ExportDialog.FileName, FileMode.Create, FileAccess.Write, FileShare.Read))
+                    {
+                        exporter.Export(stream, model);
+                    }
                 }
             }
         }
