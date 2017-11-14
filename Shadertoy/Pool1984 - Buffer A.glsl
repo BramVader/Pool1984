@@ -302,7 +302,9 @@ vec3 neonSign3(in vec2 uv)
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
-	vec2 uv = fragCoord.xy * vec2(900.0, 600.0) / iResolution.xy - vec2(22.0, 33.0);
+	if (iFrame > 2) discard;
+    
+    vec2 uv = fragCoord.xy * vec2(900.0, 600.0) / iResolution.xy - vec2(22.0, 33.0);
     fragColor.rgb =
         windowPart(uv) +
         sunlightPart(uv - vec2(300.0, 0.0)) +

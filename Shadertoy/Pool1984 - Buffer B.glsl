@@ -62,6 +62,7 @@ float four(vec2 uv)
   
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
+	if (iFrame > 2) discard;
     vec2 uv = fragCoord * 512.0 / iResolution.xy;
     
     fragColor.rgb = vec3(

@@ -58,10 +58,10 @@ namespace Pool1984
 
         private void SetScrollBar(double value)
         {
-            //suppressEvent = true;
+            suppressEvent = true;
             int scrollValue = (int)((value - min) * SettingScrollbar.Maximum / (max - min));
             SettingScrollbar.Value = Math.Min(Math.Max(scrollValue, SettingScrollbar.Minimum), SettingScrollbar.Maximum);
-            //suppressEvent = false;
+            suppressEvent = false;
         }
 
         public ValueSetter()

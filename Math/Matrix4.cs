@@ -38,7 +38,7 @@ namespace Pool1984
             return st.ToString();
         }
 
-        public static Matrix4 operator* (Matrix4 a, Matrix4 b)
+        public static Matrix4 operator *(Matrix4 a, Matrix4 b)
         {
             double[,] result = new double[4, 4];
             for (int j = 0; j < 4; j++)
@@ -61,6 +61,7 @@ namespace Pool1984
                     {
                         result[j, i] /= w;
                     }
+                result[3, 3] = 1.0;
             }
             return new Matrix4(result);
         }
@@ -78,6 +79,34 @@ namespace Pool1984
         {
             get { return elements[v, u]; }
             set { elements[v, u] = value; }
+        }
+
+        public static Matrix4 RotateAxis(Vector3 axis, double angle)
+        {
+            double sn = Math.Sin(angle);
+            double cs = Math.Cos(angle);
+            double tc = 1 - cs;
+            return new Matrix4(new[,]
+            {
+                { tc * axis.X * axis.X + cs, tc * axis.X * axis.Y - sn * axis.Z, tc * axis.X * axis.Z + sn * axis.Y, 0.0 },
+                { tc * axis.X * axis.Y + sn * axis.Z, tc * axis.Y * axis.Y + cs, tc * axis.Y * axis.Z - sn * axis.X, 0.0 },
+                { tc * axis.X * axis.Z - sn * axis.Y, tc * axis.Y * axis.Z + sn * axis.X, tc * axis.Z * axis.Z + cs, 0.0 },
+                { 0.0, 0.0, 0.0, 1.0 }
+            });
+        }
+
+        public static Matrix4 RotateAxisXY(Vector3 axis, double angle)
+        {
+            double sn = Math.Sin(angle);
+            double cs = Math.Cos(angle);
+            double tc = 1 - cs;
+            return new Matrix4(new[,]
+            {
+                { tc * axis.X * axis.X + cs, tc * axis.X * axis.Y, sn * axis.Y, 0.0 },
+                { tc * axis.X * axis.Y, tc * axis.Y * axis.Y + cs, -sn * axis.X, 0.0 },
+                { tc * -sn * axis.Y, sn * axis.X, cs, 0.0 },
+                { 0.0, 0.0, 0.0, 1.0 }
+            });
         }
 
         public static Matrix4 RotateX(double angle)

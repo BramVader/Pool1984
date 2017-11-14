@@ -10,7 +10,7 @@ namespace Pool1984
     {
         public class Spot
         {
-            public string Target { get; set; }
+            public string TargetPosition { get; set; }
 
             public PointF PixelCenter { get; set; }
             public SizeF PixelSize1 { get; set; }

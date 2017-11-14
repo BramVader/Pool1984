@@ -4,15 +4,25 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Pool1984
 {
+    [DebuggerDisplay("{Name}")]
     class Ball : Primitive
     {
         public static double TextureAngle = 0.55;
 
+        public Bitmap SphereMap { get; set; }
+        public Number Number { get; set; }
+
+        public Expression<Func<double, Vector3>> GetCenterExpr = t => new Vector3();
         public Func<double, Vector3> GetCenter = t => new Vector3();
+
+        public Expression<Func<Vector3, double, Vector3>> GetWorldToTextureTransformationExpr = (v, t) => v;
         public Func<Vector3, double, Vector3> GetWorldToTextureTransformation = (v, t) => v;
+
+        public Expression<Func<Vector3, double, Vector3>> GetTextureToWorldTransformationExpr = (v, t) => v;
         public Func<Vector3, double, Vector3> GetTextureToWorldTransformation = (v, t) => v;
 
         public double Radius { get; set; }
@@ -79,6 +89,71 @@ namespace Pool1984
             );
         }
 
+
+        private class ReplaceParameterExpressionsVisitor : ExpressionVisitor
+        {
+            private Dictionary<ParameterExpression, ParameterExpression> map;
+
+            public ReplaceParameterExpressionsVisitor(IEnumerable<ParameterExpression> oldParms, IEnumerable<ParameterExpression> newParms)
+            {
+                this.map = oldParms.Zip(newParms, (a, b) => new { a, b }).ToDictionary(it => it.a, it => it.b);
+            }
+
+            protected override Expression VisitParameter(ParameterExpression node)
+            {
+                if (map.TryGetValue(node, out var newParm))
+                    return newParm;
+                return node;
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (node.Expression is ConstantExpression cexpr)
+                {
+                    var del = Expression.Lambda(node).Compile();
+                    return Expression.Constant(del.DynamicInvoke());
+                }
+                return base.VisitMember(node);
+            }
+
+            protected override Expression VisitBinary(BinaryExpression node)
+            {
+                ConstantExpression cexpr;
+                switch (node.NodeType)
+                {
+                    case ExpressionType.Subtract:
+                        cexpr = Visit(node.Right) as ConstantExpression;
+                        if (cexpr != null && (double)cexpr.Value == 0.0)
+                            return Visit(node.Left);
+                        break;
+                    case ExpressionType.Divide:
+                        cexpr = Visit(node.Right) as ConstantExpression;
+                        if (cexpr != null && (double)cexpr.Value == 1.0)
+                            return Visit(node.Left);
+                        break;
+                }
+                return base.VisitBinary(node);
+            }
+        }
+
+        public Expression BuildRotationInterpolation(ParameterExpression vpar, ParameterExpression tpar, double startTime, double endTime, Matrix4 orientation, Vector3 axisOfRotation, double angle, bool reverse)
+        {
+            Expression<Func<Vector3, double, Vector3>> lambdaExpr;
+            double dTime = endTime - startTime;
+            if (!reverse)
+                if (angle != 0.0)
+                    lambdaExpr = (v, t) => v * Matrix4.RotateAxisXY(axisOfRotation, angle * (t - startTime) / dTime) * orientation;
+                else
+                    lambdaExpr = (v, t) => v * orientation;
+            else
+                if (angle != 0.0)
+                    lambdaExpr = (v, t) => v * orientation * Matrix4.RotateAxisXY(axisOfRotation, -angle * (t - startTime) / dTime);
+                else
+                    lambdaExpr = (v, t) => v * orientation;
+            var expr = new ReplaceParameterExpressionsVisitor(lambdaExpr.Parameters, new ParameterExpression[] { vpar, tpar }).Visit(lambdaExpr.Body);
+             return expr;
+        }
+
         private Expression BuildInterpolationExpression<T>(ParameterExpression tpar, double startTime, double endTime, T startValue, T endValue)
         {
             if (startValue.Equals(endValue))
@@ -110,65 +185,152 @@ namespace Pool1984
 
         public void ApplyKeyframes(IEnumerable<Keyframe> frames)
         {
+            var keyframes = frames.Where(it => it.StartPosition.Ball == this).OrderBy(it => it.StartTime).ToList();
+
+            // Insert missing keyframes for a full 0..1 coverage
+            double tLast = 0.0;
+            BallPosition pLast = null;
+            int i = 0;
+            while (i < keyframes.Count)
+            {
+                var keyframe = keyframes[i];
+                if (keyframe.StartTime > tLast)
+                {
+                    keyframes.Insert(i, new Keyframe { StartTime = tLast, EndTime = keyframe.StartTime, StartPosition = keyframe.StartPosition, EndPosition = keyframe.StartPosition });
+                    i++;
+                }
+                tLast = keyframe.EndTime;
+                pLast = keyframe.EndPosition;
+                i++;
+            }
+            if (tLast < 1.0)
+            {
+                keyframes.Add(new Keyframe { StartTime = tLast, EndTime = 1.0, StartPosition = pLast, EndPosition = pLast });
+            }
+
+            // Calculate axis of rotation and angles
+            Vector3 up = new Vector3(0.0, 0.0, 1.0);
+            bool hasTextureTransformation = false;
+            foreach (var keyframe in keyframes)
+            {
+                keyframe.Direction = keyframe.EndPosition.Center - keyframe.StartPosition.Center;
+                double distance = keyframe.Direction.Length;
+
+                if (distance > 0.0)
+                {
+                    keyframe.AxisOfRotation = Vector3.Cross(keyframe.Direction, up).Normalize();
+                    keyframe.Angle = distance / Radius;
+                }
+                else
+                {
+                    keyframe.Angle = 0.0;   // Ball not moving during keyframe
+                }
+
+                hasTextureTransformation |= keyframe.StartPosition.TextureToWorld.Valid || keyframe.EndPosition.TextureToWorld.Valid;
+            }
+
+            // Calculate starting matrix of each keyframe
+            if (hasTextureTransformation)
+            {
+                bool recalc;
+                do
+                {
+                    recalc = false;
+                    foreach (var keyframe in keyframes)
+                    {
+                        recalc |= !keyframe.StartPosition.TextureToWorld.Valid || !keyframe.EndPosition.TextureToWorld.Valid;
+
+                        if (keyframe.StartPosition.TextureToWorld.Valid && !keyframe.EndPosition.TextureToWorld.Valid)
+                        {
+                            keyframe.EndPosition.TextureToWorld = Matrix4.RotateAxisXY(keyframe.AxisOfRotation, keyframe.Angle) * keyframe.StartPosition.TextureToWorld;
+                            keyframe.EndPosition.WorldToTexture = keyframe.StartPosition.WorldToTexture * Matrix4.RotateAxisXY(keyframe.AxisOfRotation, -keyframe.Angle);
+                        }
+                        else if (!keyframe.StartPosition.TextureToWorld.Valid && keyframe.EndPosition.TextureToWorld.Valid)
+                        {
+                            keyframe.StartPosition.TextureToWorld = Matrix4.RotateAxisXY(keyframe.AxisOfRotation, -keyframe.Angle) * keyframe.EndPosition.TextureToWorld;
+                            keyframe.StartPosition.WorldToTexture = keyframe.EndPosition.WorldToTexture * Matrix4.RotateAxisXY(keyframe.AxisOfRotation, +keyframe.Angle);
+                        }
+                    }
+                } while (recalc);
+            }
+
+            keyframes.Reverse();
             ParameterExpression vpar = Expression.Parameter(typeof(Vector3), "v");
             ParameterExpression tpar = Expression.Parameter(typeof(double), "t");
-
             Expression centerExpr = null;
             Expression textureToWorldTransformationExpr = null;
             Expression worldToTextureTransformationExpr = null;
-            foreach (var keyframe in frames.Where(it => it.StartPosition.Ball == this).OrderByDescending(it => it.StartTime))
+            Expression expr;
+            foreach (var keyframe in keyframes)
             {
-                Expression timeCheck =
-                    Expression.AndAlso(
-                        Expression.GreaterThanOrEqual(tpar, Expression.Constant(keyframe.StartTime)),
-                        Expression.LessThan(tpar, Expression.Constant(keyframe.EndTime))
-                    );
+                Expression timeCheck = keyframe.EndTime < 1.0 ?
+                    Expression.LessThan(tpar, Expression.Constant(keyframe.EndTime)) :
+                    (Expression)null;
 
                 // Interpolating matrices over time
                 if (keyframe.StartPosition.TextureToWorld.Valid && keyframe.EndPosition.TextureToWorld.Valid)
                 {
-                    textureToWorldTransformationExpr = Expression.Condition(
-                        timeCheck,
-                        BuildMatrixInterpolation(vpar, tpar, keyframe.StartTime, keyframe.EndTime,
-                            keyframe.StartPosition.TextureToWorld,
-                            keyframe.EndPosition.TextureToWorld
-                        ),
-                        textureToWorldTransformationExpr ?? Expression.Constant(default(Vector3))
-                    );
+                    expr = BuildRotationInterpolation(vpar, tpar, keyframe.StartTime, keyframe.EndTime,
+                        keyframe.StartPosition.TextureToWorld,
+                        keyframe.AxisOfRotation,
+                        keyframe.Angle,
+                        false);
+                    textureToWorldTransformationExpr =
+                        timeCheck == null || textureToWorldTransformationExpr == null ?
+                        expr :
+                        Expression.Condition(
+                            timeCheck,
+                            expr,
+                            textureToWorldTransformationExpr
+                        );
                 }
 
                 if (keyframe.StartPosition.WorldToTexture.Valid && keyframe.EndPosition.WorldToTexture.Valid)
                 {
-                    worldToTextureTransformationExpr = Expression.Condition(
-                        timeCheck,
-                        BuildMatrixInterpolation(vpar, tpar, keyframe.StartTime, keyframe.EndTime,
-                            keyframe.StartPosition.WorldToTexture,
-                            keyframe.EndPosition.WorldToTexture
-                        ),
-                        worldToTextureTransformationExpr ?? Expression.Constant(default(Vector3))
-                    );
+                    expr = BuildRotationInterpolation(vpar, tpar, keyframe.StartTime, keyframe.EndTime,
+                        keyframe.StartPosition.WorldToTexture,
+                        keyframe.AxisOfRotation,
+                        keyframe.Angle,
+                        true);
+                    worldToTextureTransformationExpr =
+                        timeCheck == null || worldToTextureTransformationExpr == null ?
+                        expr :
+                        Expression.Condition(
+                            timeCheck,
+                            expr,
+                            worldToTextureTransformationExpr
+                        );
                 }
 
                 // Interpolating position.Center over time
-                centerExpr = Expression.Condition(
-                    timeCheck,
-                    BuildInterpolationExpression(tpar, keyframe.StartTime, keyframe.EndTime,
-                        keyframe.StartPosition.Center,
-                        keyframe.EndPosition.Center
-                    ),
-                    centerExpr ?? Expression.Constant(default(Vector3))
+                expr = BuildInterpolationExpression(tpar, keyframe.StartTime, keyframe.EndTime,
+                    keyframe.StartPosition.Center,
+                    keyframe.EndPosition.Center
                 );
 
+                centerExpr =
+                    timeCheck == null || centerExpr == null ?
+                    expr :
+                    Expression.Condition(
+                        timeCheck,
+                        expr,
+                        centerExpr
+                    );
             }
-            GetCenter = Expression.Lambda<Func<double, Vector3>>(centerExpr, tpar).Compile();
-            GetTextureToWorldTransformation =
+            GetCenterExpr = Expression.Lambda<Func<double, Vector3>>(centerExpr, tpar);
+            GetCenter = GetCenterExpr.Compile();
+
+            GetTextureToWorldTransformationExpr =
                 textureToWorldTransformationExpr != null ?
-                Expression.Lambda<Func<Vector3, double, Vector3>>(textureToWorldTransformationExpr, vpar, tpar).Compile() :
+                Expression.Lambda<Func<Vector3, double, Vector3>>(textureToWorldTransformationExpr, vpar, tpar) :
                 (v, t) => v;
-            GetWorldToTextureTransformation =
+            GetWorldToTextureTransformationExpr =
                 worldToTextureTransformationExpr != null ?
-                Expression.Lambda<Func<Vector3, double, Vector3>>(worldToTextureTransformationExpr, vpar, tpar).Compile() :
+                Expression.Lambda<Func<Vector3, double, Vector3>>(worldToTextureTransformationExpr, vpar, tpar) :
                 (v, t) => v;
+
+            GetTextureToWorldTransformation = GetTextureToWorldTransformationExpr.Compile();
+            GetWorldToTextureTransformation = GetWorldToTextureTransformationExpr.Compile();
         }
 
         public Ball()
@@ -176,17 +338,12 @@ namespace Pool1984
             Radius = 1.0;
         }
 
-        public Intersection GetClosestIntersection(Ray ray, IntersectionMode mode, BallPosition position, double minDist = Intersection.MinDistance, double maxDist = Intersection.MaxDistance)
-        {
-            return GetClosestIntersection(ray, mode, position.Center, minDist, maxDist);
-        }
-
         public override Intersection GetClosestIntersection(Ray ray, IntersectionMode mode, double time, double minDist = Intersection.MinDistance, double maxDist = Intersection.MaxDistance)
         {
             return GetClosestIntersection(ray, mode, GetCenter(time), minDist, maxDist);
         }
 
-        private Intersection GetClosestIntersection(Ray ray, IntersectionMode mode, Vector3 center, double minDist = Intersection.MinDistance, double maxDist = Intersection.MaxDistance)
+        public Intersection GetClosestIntersection(Ray ray, IntersectionMode mode, Vector3 center, double minDist = Intersection.MinDistance, double maxDist = Intersection.MaxDistance)
         {
             Intersection intsec = new Intersection() { Entity = this };
 

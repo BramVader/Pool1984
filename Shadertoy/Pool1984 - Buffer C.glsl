@@ -10,6 +10,7 @@ float hash12n(vec2 p) {
 // Fabric texture
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
+	if (iFrame > 2) discard;
     vec2 uv = vec2(
         fragCoord.x - (fragCoord.y * 34.0 / 160.0),
         fragCoord.y - (fragCoord.x * 64.0 / 147.0)

@@ -3,11 +3,11 @@ const float MINDIST = 1E-5;
 const float MAXDIST = 1E12;
 const float TEXTUREANGLE = 0.55;
 const vec3 AMBIENT = vec3(0.01);
-const float REFL = 0.4;
+const float REFL = 0.9;
 const float MAXITER = 3.0;
 
-const float SAMPLEX = 3.0;
-const float SAMPLEY = 3.0;
+const float SAMPLEX = 5.0;
+const float SAMPLEY = 5.0;
 const float SAMPLES = SAMPLEX * SAMPLEY;
 
 struct Intersection{
@@ -177,14 +177,12 @@ float GetBallShadow(Ray ray, vec3 center, float radius, float minDist, float max
 }
 
 Intersection GetIntsec(Ray ray, float t) {
-	Intersection intsec1, intsec2;
-   
-    intsec1 = GetBallIntersection(ray, GetBall1Pos(t), 1.0, MINDIST, MAXDIST, 0);
+	Intersection intsec1 = GetBallIntersection(ray, GetBall1Pos(t), 1.0, MINDIST, MAXDIST, 0);
 	if (intsec1.hit) {
 		intsec1.tnrm = GetBall1TextureTransformation(t, intsec1.nrm);
 		intsec1.txtOffset = vec2(0.0, 0.0);
 	}
-	intsec2 = GetBallIntersection(ray, GetBall9Pos(t), 1.0, MINDIST, MAXDIST, 1);
+	Intersection intsec2 = GetBallIntersection(ray, GetBall9Pos(t), 1.0, MINDIST, MAXDIST, 1);
 	if (intsec2.hit && intsec2.dist < intsec1.dist) {
 		intsec1 = intsec2;
 		intsec1.tnrm = GetBall9TextureTransformation(t, intsec1.nrm);
@@ -352,6 +350,13 @@ vec3 Render(Ray ray, int nr, float t) {
                 float i = max(0.0, dot(ltVec3 / lightDist, intsec.nrm)) * 0.333 * shadow;
                 float specularIntensity = specInt * shadow;
 
+                vec3 p = intsec.pos * 3.0 + vec3(0.00001);
+                vec3 q = round(p + vec3(0.5));
+                vec3 gr = vec3(
+                        smoothstep(0.95, 1.0, 1.0 - abs(p.x - q.x)),
+                        smoothstep(0.95, 1.0, 1.0 - abs(p.y - q.y)),
+                        smoothstep(0.95, 1.0, 1.0 - abs(p.z - q.z)));
+
                 result = result + refl * (i * color + specularIntensity + AMBIENT);
             }
         } 
@@ -369,14 +374,14 @@ vec3 Render(Ray ray, int nr, float t) {
         
         // Initialize for next iteration
         refl = intsec.obj < 5 ? REFL : 0.0;
-        if (refl < 0.1) break;
+        if (refl == 0.0) break;
         ray = mray;
     }
 	return result;
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    //fragColor.rgb = GetCubemapYellow(vec2(fragCoord.x / iResolution.x * 1024.0, fragCoord.y / iResolution.y * 255.0));
+	//fragColor.rgb = GetCubemapYellow(vec2(fragCoord.x / iResolution.x * 1024.0, fragCoord.y / iResolution.y * 255.0));
     //fragColor.rgb = texture(iChannel1, (fragCoord / iResolution.yy) * vec2(0.5, 0.5) + vec2(0.5, 0.0)).rgb;
     fragColor.rgb = texture(iChannel2, (fragCoord / iResolution.xy)).rgb;
     //return;
@@ -388,7 +393,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 		for (float smpy = 0.0; smpy < SAMPLEX; smpy += 1.0) 
         {  
             // time: 0..1 with jitter
-            float time = mod(iTime, 5.0) - 2.5 + ((smpx * SAMPLEY + smpy) + hash12n(fragCoord)) * 0.1 / SAMPLES;
+            float time = ((smpx * SAMPLEY + smpy) + hash12n(fragCoord)) / SAMPLES;
             
             // position jitter
             vec2 offs = vec2(

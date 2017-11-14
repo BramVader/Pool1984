@@ -31,6 +31,9 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.RightPanel = new System.Windows.Forms.Panel();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.ExportButton = new System.Windows.Forms.Button();
+            this.ExportersCombo = new System.Windows.Forms.ComboBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.SaveRenderingButton = new System.Windows.Forms.Button();
             this.RenderButton = new System.Windows.Forms.Button();
@@ -76,7 +79,9 @@
             this.CubeMapBox = new Pool1984.ZoomablePictureBox();
             this.rerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SaveRenderingDialog = new System.Windows.Forms.SaveFileDialog();
+            this.ExportDialog = new System.Windows.Forms.SaveFileDialog();
             this.RightPanel.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -90,6 +95,7 @@
             // RightPanel
             // 
             this.RightPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.RightPanel.Controls.Add(this.groupBox5);
             this.RightPanel.Controls.Add(this.groupBox4);
             this.RightPanel.Controls.Add(this.groupBox3);
             this.RightPanel.Controls.Add(this.groupBox2);
@@ -99,6 +105,35 @@
             this.RightPanel.Name = "RightPanel";
             this.RightPanel.Size = new System.Drawing.Size(277, 823);
             this.RightPanel.TabIndex = 1;
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.ExportButton);
+            this.groupBox5.Controls.Add(this.ExportersCombo);
+            this.groupBox5.Location = new System.Drawing.Point(5, 567);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(259, 60);
+            this.groupBox5.TabIndex = 4;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Export";
+            // 
+            // ExportButton
+            // 
+            this.ExportButton.Location = new System.Drawing.Point(156, 19);
+            this.ExportButton.Name = "ExportButton";
+            this.ExportButton.Size = new System.Drawing.Size(75, 23);
+            this.ExportButton.TabIndex = 403;
+            this.ExportButton.Text = "Export...";
+            this.ExportButton.UseVisualStyleBackColor = true;
+            this.ExportButton.Click += new System.EventHandler(this.ExportButton_Click);
+            // 
+            // ExportersCombo
+            // 
+            this.ExportersCombo.FormattingEnabled = true;
+            this.ExportersCombo.Location = new System.Drawing.Point(10, 19);
+            this.ExportersCombo.Name = "ExportersCombo";
+            this.ExportersCombo.Size = new System.Drawing.Size(138, 21);
+            this.ExportersCombo.TabIndex = 0;
             // 
             // groupBox4
             // 
@@ -113,7 +148,7 @@
             // 
             // SaveRenderingButton
             // 
-            this.SaveRenderingButton.Location = new System.Drawing.Point(121, 19);
+            this.SaveRenderingButton.Location = new System.Drawing.Point(156, 19);
             this.SaveRenderingButton.Name = "SaveRenderingButton";
             this.SaveRenderingButton.Size = new System.Drawing.Size(75, 23);
             this.SaveRenderingButton.TabIndex = 402;
@@ -125,7 +160,7 @@
             // 
             this.RenderButton.Location = new System.Drawing.Point(10, 19);
             this.RenderButton.Name = "RenderButton";
-            this.RenderButton.Size = new System.Drawing.Size(102, 23);
+            this.RenderButton.Size = new System.Drawing.Size(138, 23);
             this.RenderButton.TabIndex = 401;
             this.RenderButton.Text = "Render start/stop";
             this.RenderButton.UseVisualStyleBackColor = true;
@@ -463,7 +498,7 @@
             this.cubemapsToolStripMenuItem,
             this.spheremapsToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 75);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 97);
             // 
             // CubeMapContextActiveCubeMap
             // 
@@ -471,8 +506,9 @@
             this.CubeMapContextActiveCubeMap.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CubeMapContextActiveCubeMap.Items.AddRange(new object[] {
             "Ball 1",
-            "Ball 4a",
-            "Ball 8b"});
+            "Ball 9c",
+            "Ball 8a",
+            "Ball 4a"});
             this.CubeMapContextActiveCubeMap.Name = "CubeMapContextActiveCubeMap";
             this.CubeMapContextActiveCubeMap.Size = new System.Drawing.Size(121, 23);
             this.CubeMapContextActiveCubeMap.SelectedIndexChanged += new System.EventHandler(this.CubeMapContextActiveCubeMap_SelectedIndexChanged);
@@ -605,6 +641,10 @@
             this.SaveRenderingDialog.DefaultExt = "png";
             this.SaveRenderingDialog.Filter = "PNG-files|*.png";
             // 
+            // ExportDialog
+            // 
+            this.ExportDialog.DefaultExt = "png";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -616,6 +656,7 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.RightPanel.ResumeLayout(false);
+            this.groupBox5.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -679,6 +720,10 @@
         private System.Windows.Forms.SaveFileDialog SaveRenderingDialog;
         private System.Windows.Forms.CheckBox ViewGridCheckBox;
         private System.Windows.Forms.CheckBox ViewBoxesCheckbox;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.Button ExportButton;
+        private System.Windows.Forms.ComboBox ExportersCombo;
+        private System.Windows.Forms.SaveFileDialog ExportDialog;
     }
 }
 
