@@ -1,20 +1,4 @@
-const float PI = acos(0.0) * 2.0;
-const float MINDIST = 0.0;
-const float MAXDIST = 1000000000000.0;
-const float TEXTUREANGLE = 0.55;
-const vec3 AMBIENT = vec3(0.01, 0.01, 0.01);
-const float REFL = 0.4;
-const float MAXITER = 3.0;
-
-const float SAMPLEX = 3.0;
-const float SAMPLEY = 3.0;
-const float SAMPLES = SAMPLEX * SAMPLEY;
-
-const vec3[] LIGHT_POS = vec3[] (vec3(-21.687, 5.687, 14.04), vec3(-6.194, 7.826, 19.752), vec3(17.757, 7.688, 18.836));
-const float[] LIGHT_RAD1 = float[] (1.559, 2.419, 2.351);
-const float[] LIGHT_RAD2 = float[] (2.422, 3.096, 3.022);
-const vec3[] COLOR = vec3[] (vec3(1.507, 1.412, 0.187), vec3(1.428, 1.526, 1.01), vec3(0.0, 0.0, 0.0), vec3(0.893, 0.389, 0.861), vec3(1.428, 1.526, 1.01), vec3(0.458, 0.444, 0.407));
-
+/*<-- CONST -->*/
 
 struct Intersection{
     float dist; // Distance to object
@@ -60,82 +44,14 @@ mat3 RotateAxisXY(vec3 axis, float angle)
     );
 }
 
-vec3 GetBall1Pos (in float t)
-{
-    return vec3(-0.278, 3.745, 1.0);
-}
-
-vec3 GetBall1TextureTransformation (in float t, in vec3 v)
-{
-    return v * mat3(vec3(0.019, -0.412, 0.911), vec3(-0.353, 0.85, 0.392), vec3(-0.936, -0.329, -0.129));
-}
-
-vec3 GetBall9Pos (in float t)
-{
-    return t < 0.33 ?
-        vec3(0.024, 0.731, 1.0) + t * vec3(0.19, 0.082, 0.0) / 0.33 : 
-        vec3(0.214, 0.813, 1.0) + (t - 0.33) * vec3(0.177, 0.37, 0.0) / 0.67;
-}
-
-vec3 GetBall9TextureTransformation (in float t, in vec3 v)
-{
-    return t < 0.33 ?
-        v * RotateAxisXY(vec3(0.395, -0.919, 0.0), 0.207 * t / 0.33) * mat3(vec3(0.028, 0.103, 0.978), vec3(0.138, -0.994, 0.131), vec3(0.957, 0.055, 0.276)) : 
-        v * RotateAxisXY(vec3(0.902, -0.433, 0.0), 0.41 * (t - 0.33) / 0.67) * mat3(vec3(0.034, 0.184, 0.978), vec3(0.134, -0.981, 0.189), vec3(0.975, 0.07, 0.089));
-}
-
-vec3 GetBall8Pos (in float t)
-{
-    return t < 0.33 ?
-        vec3(2.047, -0.078, 1.0) : 
-        t < 0.735 ?
-            vec3(2.047, -0.078, 1.0) + (t - 0.33) * vec3(0.238, -0.087, 0.0) / 0.405 : 
-            vec3(2.285, -0.166, 1.0);
-}
-
-vec3 GetBall8TextureTransformation (in float t, in vec3 v)
-{
-    return t < 0.33 ?
-        v * mat3(vec3(-0.29, -0.038, 0.956), vec3(0.003, -0.999, -0.038), vec3(0.957, -0.008, 0.29)) : 
-        t < 0.735 ?
-            v * RotateAxisXY(vec3(-0.344, -0.939, 0.0), 0.253 * (t - 0.33) / 0.405) * mat3(vec3(-0.29, -0.038, 0.956), vec3(0.003, -0.999, -0.038), vec3(0.957, -0.008, 0.29)) : 
-            v * mat3(vec3(-0.275, -0.123, 0.991), vec3(-0.008, -0.992, -0.124), vec3(0.932, -0.024, 0.055));
-}
-
-vec3 GetBall4Pos (in float t)
-{
-    return t < 0.735 ?
-        vec3(3.891, -1.358, 1.0) : 
-        vec3(3.891, -1.358, 1.0) + (t - 0.735) * vec3(0.135, -0.097, 0.0) / 0.265;
-}
-
-vec3 GetBall4TextureTransformation (in float t, in vec3 v)
-{
-    return t < 0.735 ?
-        v * mat3(vec3(-0.708, 0.189, 0.681), vec3(0.127, -0.914, 0.385), vec3(0.695, 0.359, 0.623)) : 
-        v * RotateAxisXY(vec3(-0.585, -0.811, 0.0), 0.166 * (t - 0.735) / 0.265) * mat3(vec3(-0.708, 0.189, 0.681), vec3(0.127, -0.914, 0.385), vec3(0.695, 0.359, 0.623));
-}
-
-vec3 GetBallwPos (in float t)
-{
-    return vec3(-2.645, -0.519, 1.0) + t * vec3(-0.028, 0.088, 0.0);
-}
-
-vec3 GetBallwTextureTransformation (in float t, in vec3 v)
-{
-    return v;
-}
-
+/*<-- POSITIONS -->*/
 
 Camera GetCamera() {
     Camera camera;
     
     if (iMouse.w < 0.0)
     {
-        camera.from = vec3(0.0, 0.0, 20.0);
-        camera.at = vec3(0.0, 0.0, 0.0);
-        camera.up = vec3(0.819, 0.574, 0.0);
-        camera.aper = vec2(13.442, 11.388);
+/*<-- CAMERA -->*/
     }
     else
     {

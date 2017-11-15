@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Pool1984.Exporters
@@ -14,43 +15,17 @@ namespace Pool1984.Exporters
             return "Shader files|*.glsl";
         }
 
-        private string staticCode = @"
-const float PI = acos(0.0) * 2.0;
-const float MINDIST = 1E-5;
-const float MAXDIST = 1E12;
-const float TEXTUREANGLE = 0.55;
-
-struct Intersection
-{
-	float dist;
-	vec3 pos;
-	vec3 nrm;
-    vec3 tnrm;
-    bool hit;
-    int obj;
-    vec2 txtOffset;
-};
-
-struct Ray
-{
-	vec3 ro;
-	vec3 rd;
-};
-
-float hash12n(vec2 p)
-{
-	p  = fract(p * vec2(5123.3987, 5151.4321));
-    p += dot(p.yx, p.xy + vec2(21.5351, 14.3137));
-	return fract(p.x * p.y * 95.4323);
-}
-        ";
+        public override string GetDefaultLocation()
+        {
+            return Path.GetFullPath(@"..\..\Shadertoy\Pool1984 - Image.glsl");
+        }
 
         private string DoubleToString(double d) => d.ToString("0.0##", CultureInfo.InvariantCulture);
         private string VecToString(Vector2 v) => $"vec2({DoubleToString(v.X)}, {DoubleToString(v.Y)})";
         private string VecToString(Vector3 v) => $"vec3({DoubleToString(v.X)}, {DoubleToString(v.Y)}, {DoubleToString(v.Z)})";
         private string ColToString(Color3 c) => $"vec3({DoubleToString(c.R)}, {DoubleToString(c.G)}, {DoubleToString(c.B)})";
         private string MatrixColumnToString(Matrix4 value, int v) => $"vec3({DoubleToString(value[0, v])}, {DoubleToString(value[1, v])}, {DoubleToString(value[2, v])})";
-        private string Matrix4ToString(Matrix4 value) => $"mat3({MatrixColumnToString(value, 0)}, {MatrixColumnToString(value, 1)}, {MatrixColumnToString(value, 2)})"; 
+        private string Matrix4ToString(Matrix4 value) => $"mat3({MatrixColumnToString(value, 0)}, {MatrixColumnToString(value, 1)}, {MatrixColumnToString(value, 2)})";
 
         private string ExpressionToString(Expression expr, int indent = 0)
         {
@@ -86,7 +61,7 @@ float hash12n(vec2 p)
                                         ExpressionToString(nexpr.Arguments[0], 0, indent + 1) + ", " + getNewLine(indent + 1) +
                                         ExpressionToString(nexpr.Arguments[1], 0, indent + 1) + getNewLine(indent) +
                                     ")" :
-                                    st  :
+                                    st :
                             "vec2(0.0)";
                     if (nexpr.Type == typeof(Vector3)) return
                             nexpr.Arguments.Count() == 3 ?
@@ -118,7 +93,7 @@ float hash12n(vec2 p)
                 case ExpressionType.GreaterThanOrEqual:
                     return ExpressionToString(bexpr.Left, 0, indent) + " >= " + ExpressionToString(bexpr.Right, 0, indent);
                 case ExpressionType.Add:
-                    return 
+                    return
                         level == 0 ?
                             ExpressionToString(bexpr.Left, 0, indent) + " + " + ExpressionToString(bexpr.Right, 0, indent) :
                             "(" + ExpressionToString(bexpr.Left, 0, indent) + " + " + ExpressionToString(bexpr.Right, 0, indent) + ")";
@@ -149,60 +124,67 @@ float hash12n(vec2 p)
 
         public override void Export(Stream outputStream, Model model)
         {
-            using (StreamWriter sw = new StreamWriter(outputStream))
+            string template;
+            using (StreamReader sr = new StreamReader(new FileStream(@"Shadertoy\Pool1984 - Image Template.glsl", FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
-                sw.WriteLine(staticCode);
-
-                sw.WriteLine("vec3[] lightPos = vec3[] (" + String.Join(", ", model.Lights.Select(lt => VecToString(lt.Center))) + ");");
-                sw.WriteLine("float[] lightRad1 = float[] (" + String.Join(", ", model.Lights.Select(lt => DoubleToString(lt.Radius1))) + ");");
-                sw.WriteLine("float[] lightRad2 = float[] (" + String.Join(", ", model.Lights.Select(lt => DoubleToString(lt.Radius2))) + ");");
-
-                sw.WriteLine("vec3[] entityColor = vec3[] (" + String.Join(", ", model.Primitives.Select(ball => ColToString(ball.DiffuseColor))) + ");");
-                sw.WriteLine();
-
-                foreach (var ball in model.Primitives.OfType<Ball>())
-                {
-                    string name1 = ball.Name.Replace(" ", "");
-                    string name2 = name1.ToLower();
-
-                    sw.WriteLine($"vec3 Get{name1}Pos (in float t)");
-                    sw.WriteLine("{");
-                    sw.WriteLine($"    return {ExpressionToString(ball.GetCenterExpr, 1)};");
-                    sw.WriteLine("}");
-                    sw.WriteLine("");
-                    sw.WriteLine($"vec3 Get{name1}TextureTransformation (in float t, in vec3 v)");
-                    sw.WriteLine("{");
-                    sw.WriteLine($"    return {ExpressionToString(ball.GetWorldToTextureTransformationExpr, 1)};");
-                    sw.WriteLine("}");
-                    sw.WriteLine("");
-                }
-
-                sw.WriteLine("Ray GetCamera(in vec2 fragCoord)");
-                sw.WriteLine("{");
-                sw.WriteLine($"    vec3 from = {VecToString(model.Camera.From)};");
-                sw.WriteLine($"    vec3 at = {VecToString(model.Camera.At)};");
-                sw.WriteLine($"    vec3 up = {VecToString(model.Camera.Up)};");
-                sw.WriteLine($"    vec2 aper = {VecToString(new Vector2(model.Camera.ApertureH, model.Camera.ApertureV))};");
-                sw.WriteLine(@"
-    vec3 look = at - from;
-    float dist = length(look);
-    float hsize = tan(aper.x * PI / 180.0) * dist;
-    float vsize = tan(aper.y * PI / 180.0) * dist;
-    if (hsize * iResolution.x / iResolution.y > vsize)
-        hsize = vsize * iResolution.x / iResolution.y;
-    else
-        vsize = hsize * iResolution.y / iResolution.x;
-    vec3 hor = normalize(cross(look, up)) * hsize;
-    vec3 ver = normalize(cross(hor, look)) * vsize;
-    Ray ray;
-    ray.ro = from;
-    ray.rd = normalize(look + 
-   		(fragCoord.x / iResolution.x * 2.0 - 1.0) * hor + 
-        (fragCoord.y / iResolution.y * 2.0 - 1.0) * ver);
-    return ray;
-}");
-                sw.WriteLine();
+                template = sr.ReadToEnd();
             }
+
+            var sb = new StringBuilder();
+            sb.AppendLine("const float PI = acos(0.0) * 2.0;");
+            sb.AppendLine($"const float MINDIST = {DoubleToString(Intersection.MinDistance)};");
+            sb.AppendLine($"const float MAXDIST = {DoubleToString(Intersection.MaxDistance)};");
+            sb.AppendLine($"const float TEXTUREANGLE = {DoubleToString(Ball.TextureAngle)};");
+            sb.AppendLine($"const vec3 AMBIENT = {ColToString(model.AmbientColor)};");
+            sb.AppendLine($"const float REFL = {DoubleToString(model.Reflection)};");
+            sb.AppendLine($"const float MAXITER = {DoubleToString(model.IterationDepth)};");
+            sb.AppendLine();
+            sb.AppendLine($"const float SAMPLEX = {DoubleToString(model.NrSamplesX)};");
+            sb.AppendLine($"const float SAMPLEY = {DoubleToString(model.NrSamplesY)};");
+            sb.AppendLine("const float SAMPLES = SAMPLEX * SAMPLEY;");
+            sb.AppendLine();
+            sb.AppendLine("const vec3[] LIGHT_POS = vec3[] (" + String.Join(", ", model.Lights.Select(lt => VecToString(lt.Center))) + ");");
+            sb.AppendLine("const float[] LIGHT_RAD1 = float[] (" + String.Join(", ", model.Lights.Select(lt => DoubleToString(lt.Radius1))) + ");");
+            sb.AppendLine("const float[] LIGHT_RAD2 = float[] (" + String.Join(", ", model.Lights.Select(lt => DoubleToString(lt.Radius2))) + ");");
+            sb.AppendLine("const vec3[] COLOR = vec3[] (" + String.Join(", ", model.Primitives.Select(ball => ColToString(ball.DiffuseColor))) + ");");
+            sb.AppendLine();
+            string constPart = sb.ToString();
+
+            sb = new StringBuilder();
+            foreach (var ball in model.Primitives.OfType<Ball>())
+            {
+                string name1 = ball.Name.Replace(" ", "");
+                string name2 = name1.ToLower();
+
+                sb.AppendLine($"vec3 Get{name1}Pos (in float t)");
+                sb.AppendLine("{");
+                sb.AppendLine($"    return {ExpressionToString(ball.GetCenterExpr, 1)};");
+                sb.AppendLine("}");
+                sb.AppendLine("");
+                sb.AppendLine($"vec3 Get{name1}TextureTransformation (in float t, in vec3 v)");
+                sb.AppendLine("{");
+                sb.AppendLine($"    return {ExpressionToString(ball.GetWorldToTextureTransformationExpr, 1)};");
+                sb.AppendLine("}");
+                sb.AppendLine("");
+            }
+            string positionsPart = sb.ToString();
+
+            sb = new StringBuilder();
+            sb.AppendLine($"        camera.from = {VecToString(model.Camera.From)};");
+            sb.AppendLine($"        camera.at = {VecToString(model.Camera.At)};");
+            sb.AppendLine($"        camera.up = {VecToString(model.Camera.Up)};");
+            sb.AppendLine($"        camera.aper = {VecToString(new Vector2(model.Camera.ApertureH, model.Camera.ApertureV))};");
+            string cameraPart = sb.ToString();
+
+            string result = template
+                .Replace("/*<-- CONST -->*/\r\n", constPart)
+                .Replace("/*<-- POSITIONS -->*/\r\n", positionsPart)
+                .Replace("/*<-- CAMERA -->*/\r\n", cameraPart);
+
+            byte[] data = Encoding.UTF8.GetBytes(result);
+            outputStream.Write(data, 0, data.Length);
+            outputStream.Close();
         }
     }
 }
+

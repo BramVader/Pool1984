@@ -17,5 +17,13 @@ namespace Pool1984
         public Color3 AmbientColor { get; set; } = new Color3(0.01, 0.01, 0.01);
 
         public CubeTexture CubeMap { get; set; }
+
+        public double Reflection { get; set; } = 0.4;
+
+        public int NrSamplesX { get; set; } = 3;
+
+        public int NrSamplesY { get; set; } = 3;
+
+        public int IterationDepth { get; set; } = 3;
     }
 }

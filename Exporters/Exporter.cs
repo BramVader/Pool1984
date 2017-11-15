@@ -15,6 +15,8 @@ namespace Pool1984.Exporters
 
         public abstract string GetFileDialogFilter();
 
+        public abstract string GetDefaultLocation();
+
         public abstract void Export(Stream outputStream, Model model);
     }
 }

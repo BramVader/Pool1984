@@ -8,7 +8,6 @@ namespace Pool1984
     {
         public string Name { get; set; }
         public Color3 DiffuseColor { get; set; }
-        public double Reflection { get; set; }
 
         public Texture Texture { get; set; }
 

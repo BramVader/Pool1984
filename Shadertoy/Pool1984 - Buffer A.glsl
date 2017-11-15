@@ -77,7 +77,7 @@ float player(in vec2 uv)
 {
     float stick =
         step(118.0 + (116.5 - 118.0) * (uv.y - 25.4) / (237.1 - 25.4), uv.x) *
-    	step(uv.x, 120.5 + (117.2 - 120.5) * (uv.y - 25.4) / (237.1 - 25.4)) *
+        step(uv.x, 120.5 + (117.2 - 120.5) * (uv.y - 25.4) / (237.1 - 25.4)) *
         step(uv.y, 237.1);
     ivec2 iv = ivec2(vec2((uv.x - 74.6)*1.05, (204.7 - uv.y)*0.36));
     if (iv.x >= 4 && iv.x < 35 && iv.y >= 1 && iv.y < 50)
@@ -120,7 +120,7 @@ float palmtrees(in vec2 uv)
 
 float windowPattern(in vec2 uv)
 {
-	return
+    return
         xin(0.0, 39.0) *( yin(0.0, 65.0) + yin(73.0, 237.0) ) +
         xin(63.0, 153.0) *( yin(39.0, 179.0) + yin(196.0, 255.0) ) *
         (max( xout(81.0, 85.0) * xout(136.0, 140.0), step(uv.y, 179.0) ) ) +
@@ -157,12 +157,12 @@ vec3 sunlightPart(in vec2 uv)
     d2 =
         xin(75.0, 142.3) * step(uv.y, 262.6) *
         max(
-        	step(1.0, length((uv - vec2(113.0, 263.3)) / dv)) *
-        	step(length((uv - vec2(113.0, 222.5)) / dv), 1.0) +
-        	step(1.0, length((uv - vec2(113.0, 200.8)) / dv)) *
-        	step(length((uv - vec2(113.0, 169.7)) / dv), 1.0) +
-        	step(1.0, length((uv - vec2(113.0, 148.0)) / dv)) *
-        	step(length((uv - vec2(113.0, 116.9)) / dv), 1.0),
+            step(1.0, length((uv - vec2(113.0, 263.3)) / dv)) *
+            step(length((uv - vec2(113.0, 222.5)) / dv), 1.0) +
+            step(1.0, length((uv - vec2(113.0, 200.8)) / dv)) *
+            step(length((uv - vec2(113.0, 169.7)) / dv), 1.0) +
+            step(1.0, length((uv - vec2(113.0, 148.0)) / dv)) *
+            step(length((uv - vec2(113.0, 116.9)) / dv), 1.0),
 
             xout(82.9, 134.4) * yin(0.0, 180.0)
         );
@@ -170,7 +170,7 @@ vec3 sunlightPart(in vec2 uv)
 
     // Sunlight projected on the wall
     vec2 tuv = vec2(uv.x - (255.0 - uv.y) * 0.06, 255.0 - uv.y - uv.x);
-	for (int y = 0; y < 4; y++)
+    for (int y = 0; y < 4; y++)
     {
         if (tuv.y >= y1[y] && tuv.y <= y2[y] && uv.y > 0.0)
         for (int x = 0; x < 4; x++)
@@ -302,7 +302,7 @@ vec3 neonSign3(in vec2 uv)
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
-	if (iFrame > 2) discard;
+    if (iFrame > 2) discard;
     
     vec2 uv = fragCoord.xy * vec2(900.0, 600.0) / iResolution.xy - vec2(22.0, 33.0);
     fragColor.rgb =

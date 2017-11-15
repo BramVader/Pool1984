@@ -184,8 +184,8 @@ namespace Pool1984
                     double specularIntensity = specInt * shadow;
                     col += diffuseIntensity * light.Color * diffuseColor + specularIntensity * light.Color + model.AmbientColor;
 
-                    if (depth < 3 && primitive.Reflection > 0.0)
-                        col += primitive.Reflection * RenderRay(mirrorRay, sample, depth + 1);
+                    if (depth < model.IterationDepth && primitive is Ball)
+                        col += model.Reflection * RenderRay(mirrorRay, sample, depth + 1);
                 }
             }
             else

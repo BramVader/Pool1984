@@ -15,6 +15,8 @@ namespace Pool1984
 
         public Bitmap SphereMap { get; set; }
         public Number Number { get; set; }
+        public double Radius { get; set; }
+        public Color3 BandColor { get; set; }
 
         public Expression<Func<double, Vector3>> GetCenterExpr = t => new Vector3();
         public Func<double, Vector3> GetCenter = t => new Vector3();
@@ -24,9 +26,6 @@ namespace Pool1984
 
         public Expression<Func<Vector3, double, Vector3>> GetTextureToWorldTransformationExpr = (v, t) => v;
         public Func<Vector3, double, Vector3> GetTextureToWorldTransformation = (v, t) => v;
-
-        public double Radius { get; set; }
-        public Color3 BandColor { get; set; }
 
         public Expression BuildMatrixInterpolation(ParameterExpression vpar, ParameterExpression tpar, double startTime, double endTime, Matrix4 a, Matrix4 b)
         {

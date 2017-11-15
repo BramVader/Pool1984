@@ -2,15 +2,15 @@ const float PI = acos(0.0) * 2.0;
 
 
 float hash12n(vec2 p) {
-	p = fract(p * vec2(5123.3987, 5151.4321));
-	p += dot(p.yx, p.xy + vec2(21.5351, 14.3137));
-	return fract(p.x * p.y * 95.4323);
+    p = fract(p * vec2(5123.3987, 5151.4321));
+    p += dot(p.yx, p.xy + vec2(21.5351, 14.3137));
+    return fract(p.x * p.y * 95.4323);
 }
 
 // Fabric texture
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
-	if (iFrame > 2) discard;
+    if (iFrame > 2) discard;
     vec2 uv = vec2(
         fragCoord.x - (fragCoord.y * 34.0 / 160.0),
         fragCoord.y - (fragCoord.x * 64.0 / 147.0)

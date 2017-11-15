@@ -18,11 +18,6 @@ namespace Pool1984
     public partial class Form1 : Form
     {
         private static int textureSize = 512;
-        private double ambient = 0.01;
-        private double reflection = 0.3;
-
-        private int nrSamplesX = 3;
-        private int nrSamplesY = 3;
 
         private static Number[] numbers = new Number[]
         {
@@ -180,39 +175,34 @@ namespace Pool1984
                     Name = "Ball 1",
                     DiffuseColor = colorRefs[5].Measured,
                     BandColor = colorRefs[5].Measured,
-                    Texture = UnpackTexture(0),
-                    Reflection = reflection
+                    Texture = UnpackTexture(0)
                 },
                 new Ball
                 {
                     Name = "Ball 9",
                     DiffuseColor = Color3.FromColor(Color.FromArgb(234, 246, 163)),
                     BandColor = colorRefs[5].Measured,
-                    Texture = UnpackTexture(3),
-                    Reflection = reflection
+                    Texture = UnpackTexture(3)
                 },
                 new Ball
                 {
                     Name = "Ball 8",
                     DiffuseColor = Color3.FromColor(Color.Black),
                     BandColor = Color3.FromColor(Color.Black),
-                    Texture = UnpackTexture(2),
-                    Reflection = reflection
+                    Texture = UnpackTexture(2)
                 },
                 new Ball
                 {
                     Name = "Ball 4",
                     DiffuseColor = colorRefs[6].Measured,
                     BandColor = colorRefs[6].Measured,
-                    Texture = UnpackTexture(1),
-                    Reflection = reflection
+                    Texture = UnpackTexture(1)
                 },
                 new Ball
                 {
                     Name = "Ball w",
                     DiffuseColor = Color3.FromColor(Color.FromArgb(234, 246, 163)),
-                    BandColor = Color3.FromColor(Color.FromArgb(234, 246, 163)),
-                    Reflection = reflection
+                    BandColor = Color3.FromColor(Color.FromArgb(234, 246, 163))
                 },
                 new Plane
                 {
@@ -259,7 +249,7 @@ namespace Pool1984
             {
                 Camera = new Camera() { ApertureH = 7.4, ApertureV = 6.3 },
                 CubeMap = cubeMap,
-                AmbientColor = new Color3(ambient, ambient, ambient),
+                AmbientColor = new Color3(0.01, 0.01, 0.01),
                 Primitives = primitives.Values,
                 Lights = lights
             };
@@ -1441,7 +1431,7 @@ namespace Pool1984
                 ViewRenderingCheckBox.Checked = true;
                 int width = renderBitmap.Width;
                 int height = renderBitmap.Height;
-                var raytracer = new Raytracer(nrSamplesX, nrSamplesY, renderBitmap.Width, renderBitmap.Height, model);
+                var raytracer = new Raytracer(model.NrSamplesX, model.NrSamplesY, renderBitmap.Width, renderBitmap.Height, model);
                 IProgress<Raytracer.Line> progress = new Progress<Raytracer.Line>(line =>
                 {
                     BitmapData bmpDataWrite = null;
@@ -1496,6 +1486,12 @@ namespace Pool1984
                 var exporter = (Exporter)Activator.CreateInstance(exporterType);
                 ExportDialog.DefaultExt = exporter.GetFileDialogFilter().Split('|')[1];
                 ExportDialog.Filter = exporter.GetFileDialogFilter();
+                if (String.IsNullOrEmpty(ExportDialog.FileName))
+                {
+                    ExportDialog.FileName = exporter.GetDefaultLocation();
+                    ExportDialog.InitialDirectory = Path.GetDirectoryName(ExportDialog.FileName);
+                }
+
                 if (ExportDialog.ShowDialog() == DialogResult.OK)
                 {
                     using (var stream = new FileStream(ExportDialog.FileName, FileMode.Create, FileAccess.Write, FileShare.Read))
@@ -1514,7 +1510,7 @@ namespace Pool1984
             );
             if (p.X >= 0 && p.X <= renderBitmap.Width && p.Y >= 0 && p.Y <= renderBitmap.Height)
             {
-                var raytracer = new Raytracer(nrSamplesX, nrSamplesY, renderBitmap.Width, renderBitmap.Height, model);
+                var raytracer = new Raytracer(model.NrSamplesX, model.NrSamplesY, renderBitmap.Width, renderBitmap.Height, model);
                 Color3 col = raytracer.RenderPixel(p);
                 RenderButton.BackColor = col.ToColor();
             }

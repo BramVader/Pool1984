@@ -8,7 +8,7 @@ float smin( float a, float b, float k )
 float one(vec2 uv)
 {
     float d = length((uv - vec2(131.0, 186.1)) / vec2(15.4, 9.5)) - 1.0;
-	d = min(d, length((uv - vec2(131.0, 65.1)) / vec2(15.4, 9.5)) - 1.0);
+    d = min(d, length((uv - vec2(131.0, 65.1)) / vec2(15.4, 9.5)) - 1.0);
     d = min(d, max(abs(uv.x - 131.0) / 15.4, abs(uv.y - 125.5) / 60.6) - 1.0);
     return smoothstep(0.03, 0.0, d);
 } 
@@ -16,7 +16,7 @@ float one(vec2 uv)
 float nine(vec2 uv)
 {
     float d1 = 1.0 - length((uv - vec2(128.5, 162.9)) / vec2(20.2, 24.2));
-	float d2 = 1.0 - length((uv - vec2(128.8, 118.9)) / vec2(27.4, 39.2));
+    float d2 = 1.0 - length((uv - vec2(128.8, 118.9)) / vec2(27.4, 39.2));
     float d3 = 1.0 - max(abs(uv.x - 127.4) / 68.2, abs(uv.y - 131.4) / 37.6);
     
     float d = max(d1, max(d2, -d3));
@@ -26,7 +26,7 @@ float nine(vec2 uv)
                 max(
                     length((uv - vec2(126.5, 100.0)) / vec2(51.3, 44.0)) - 1.0, 
                     max(d2, d3)
-               	)
+                   )
             )
         );
     d = min(d, max(length((uv - vec2(129.4, 159.7)) / vec2(49.0, 42.9)) - 1.0, d1));
@@ -37,8 +37,8 @@ float nine(vec2 uv)
 
 float eight(vec2 uv)
 {
-	float d = length((uv - vec2(129.3, 163.5)) / vec2(49.1, 39.2)) - 1.0;
-	d = smin(d, length((uv - vec2(129.3, 97.7)) / vec2(52.8, 41.8)) - 1.0, 16.0);
+    float d = length((uv - vec2(129.3, 163.5)) / vec2(49.1, 39.2)) - 1.0;
+    d = smin(d, length((uv - vec2(129.3, 97.7)) / vec2(52.8, 41.8)) - 1.0, 16.0);
 
     d = max(d, 1.0 - length((uv - vec2(129.3, 161.9)) / vec2(17.7, 21.5)));
     d = max(d, 1.0 - length((uv - vec2(129.3, 97.3)) / vec2(19.5, 25.2)));
@@ -62,7 +62,7 @@ float four(vec2 uv)
   
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
-	if (iFrame > 2) discard;
+    if (iFrame > 2) discard;
     vec2 uv = fragCoord * 512.0 / iResolution.xy;
     
     fragColor.rgb = vec3(
