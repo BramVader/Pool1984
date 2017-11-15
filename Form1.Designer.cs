@@ -194,7 +194,7 @@
             this.timeSetter.Max = 1D;
             this.timeSetter.Min = 0D;
             this.timeSetter.Name = "timeSetter";
-            this.timeSetter.Size = new System.Drawing.Size(225, 23);
+            this.timeSetter.Size = new System.Drawing.Size(241, 23);
             this.timeSetter.TabIndex = 340;
             this.timeSetter.Value = 0D;
             this.timeSetter.ValueChanged += new System.EventHandler(this.TimeSetter_ValueChanged);
@@ -498,7 +498,7 @@
             this.cubemapsToolStripMenuItem,
             this.spheremapsToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 97);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(182, 75);
             // 
             // CubeMapContextActiveCubeMap
             // 

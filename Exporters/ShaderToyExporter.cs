@@ -45,14 +45,12 @@ float hash12n(vec2 p)
 }
         ";
 
-        private string DoubleToString(double d)
-        {
-            string val = d.ToString("0.0##", CultureInfo.InvariantCulture);
-            return val;
-        }
+        private string DoubleToString(double d) => d.ToString("0.0##", CultureInfo.InvariantCulture);
         private string VecToString(Vector2 v) => $"vec2({DoubleToString(v.X)}, {DoubleToString(v.Y)})";
         private string VecToString(Vector3 v) => $"vec3({DoubleToString(v.X)}, {DoubleToString(v.Y)}, {DoubleToString(v.Z)})";
         private string ColToString(Color3 c) => $"vec3({DoubleToString(c.R)}, {DoubleToString(c.G)}, {DoubleToString(c.B)})";
+        private string MatrixColumnToString(Matrix4 value, int v) => $"vec3({DoubleToString(value[0, v])}, {DoubleToString(value[1, v])}, {DoubleToString(value[2, v])})";
+        private string Matrix4ToString(Matrix4 value) => $"mat3({MatrixColumnToString(value, 0)}, {MatrixColumnToString(value, 1)}, {MatrixColumnToString(value, 2)})"; 
 
         private string ExpressionToString(Expression expr, int indent = 0)
         {
@@ -76,6 +74,7 @@ float hash12n(vec2 p)
                     if (cexpr1.Value.GetType() == typeof(double)) return DoubleToString((double)cexpr1.Value);
                     if (cexpr1.Value.GetType() == typeof(Vector2)) return VecToString((Vector2)cexpr1.Value);
                     if (cexpr1.Value.GetType() == typeof(Vector3)) return VecToString((Vector3)cexpr1.Value);
+                    if (cexpr1.Value.GetType() == typeof(Matrix4)) return Matrix4ToString((Matrix4)cexpr1.Value);
                     return cexpr1.Value.ToString();
                 case ExpressionType.New:
                     var nexpr = expr as NewExpression;
@@ -100,6 +99,9 @@ float hash12n(vec2 p)
                                     st :
                             "vec3(0.0)";
                     throw new Exception("Unsupported type");
+                case ExpressionType.Call:
+                    var cexpr2 = expr as MethodCallExpression;
+                    return cexpr2.Method.Name + "(" + String.Join(", ", cexpr2.Arguments.Select(it => ExpressionToString(it, 0, indent))) + ")";
                 case ExpressionType.MemberAccess:
                     var mexpr = expr as MemberExpression;
                     return ExpressionToString(mexpr.Expression, 0, indent) + "." + mexpr.Member.Name.ToLower();

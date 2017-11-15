@@ -142,12 +142,12 @@ namespace Pool1984
             double dTime = endTime - startTime;
             if (!reverse)
                 if (angle != 0.0)
-                    lambdaExpr = (v, t) => v * Matrix4.RotateAxisXY(axisOfRotation, angle * (t - startTime) / dTime) * orientation;
+                    lambdaExpr = (v, t) => v * orientation * Matrix4.RotateAxisXY(axisOfRotation, -angle * (t - startTime) / dTime);
                 else
                     lambdaExpr = (v, t) => v * orientation;
             else
                 if (angle != 0.0)
-                    lambdaExpr = (v, t) => v * orientation * Matrix4.RotateAxisXY(axisOfRotation, -angle * (t - startTime) / dTime);
+                    lambdaExpr = (v, t) => v * Matrix4.RotateAxisXY(axisOfRotation, angle * (t - startTime) / dTime) * orientation;
                 else
                     lambdaExpr = (v, t) => v * orientation;
             var expr = new ReplaceParameterExpressionsVisitor(lambdaExpr.Parameters, new ParameterExpression[] { vpar, tpar }).Visit(lambdaExpr.Body);
@@ -242,13 +242,13 @@ namespace Pool1984
 
                         if (keyframe.StartPosition.TextureToWorld.Valid && !keyframe.EndPosition.TextureToWorld.Valid)
                         {
-                            keyframe.EndPosition.TextureToWorld = Matrix4.RotateAxisXY(keyframe.AxisOfRotation, keyframe.Angle) * keyframe.StartPosition.TextureToWorld;
-                            keyframe.EndPosition.WorldToTexture = keyframe.StartPosition.WorldToTexture * Matrix4.RotateAxisXY(keyframe.AxisOfRotation, -keyframe.Angle);
+                            keyframe.EndPosition.TextureToWorld = keyframe.StartPosition.TextureToWorld * Matrix4.RotateAxisXY(keyframe.AxisOfRotation, -keyframe.Angle);
+                            keyframe.EndPosition.WorldToTexture = Matrix4.RotateAxisXY(keyframe.AxisOfRotation, keyframe.Angle) * keyframe.StartPosition.WorldToTexture;
                         }
                         else if (!keyframe.StartPosition.TextureToWorld.Valid && keyframe.EndPosition.TextureToWorld.Valid)
                         {
-                            keyframe.StartPosition.TextureToWorld = Matrix4.RotateAxisXY(keyframe.AxisOfRotation, -keyframe.Angle) * keyframe.EndPosition.TextureToWorld;
-                            keyframe.StartPosition.WorldToTexture = keyframe.EndPosition.WorldToTexture * Matrix4.RotateAxisXY(keyframe.AxisOfRotation, +keyframe.Angle);
+                            keyframe.StartPosition.TextureToWorld = keyframe.EndPosition.TextureToWorld * Matrix4.RotateAxisXY(keyframe.AxisOfRotation, keyframe.Angle);
+                            keyframe.StartPosition.WorldToTexture = Matrix4.RotateAxisXY(keyframe.AxisOfRotation, -keyframe.Angle) * keyframe.EndPosition.WorldToTexture;
                         }
                     }
                 } while (recalc);
@@ -271,10 +271,10 @@ namespace Pool1984
                 if (keyframe.StartPosition.TextureToWorld.Valid && keyframe.EndPosition.TextureToWorld.Valid)
                 {
                     expr = BuildRotationInterpolation(vpar, tpar, keyframe.StartTime, keyframe.EndTime,
-                        keyframe.StartPosition.TextureToWorld,
-                        keyframe.AxisOfRotation,
-                        keyframe.Angle,
-                        false);
+                        orientation: keyframe.StartPosition.TextureToWorld,
+                        axisOfRotation: keyframe.AxisOfRotation,
+                        angle: keyframe.Angle,
+                        reverse: false);
                     textureToWorldTransformationExpr =
                         timeCheck == null || textureToWorldTransformationExpr == null ?
                         expr :
@@ -289,9 +289,9 @@ namespace Pool1984
                 {
                     expr = BuildRotationInterpolation(vpar, tpar, keyframe.StartTime, keyframe.EndTime,
                         keyframe.StartPosition.WorldToTexture,
-                        keyframe.AxisOfRotation,
-                        keyframe.Angle,
-                        true);
+                        axisOfRotation: keyframe.AxisOfRotation,
+                        angle: keyframe.Angle,
+                        reverse: true);
                     worldToTextureTransformationExpr =
                         timeCheck == null || worldToTextureTransformationExpr == null ?
                         expr :

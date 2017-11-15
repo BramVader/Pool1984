@@ -6,8 +6,8 @@ const vec3 AMBIENT = vec3(0.01);
 const float REFL = 0.4;
 const float MAXITER = 3.0;
 
-const float SAMPLEX = 3.0;
-const float SAMPLEY = 3.0;
+const float SAMPLEX = 4.0;
+const float SAMPLEY = 4.0;
 const float SAMPLES = SAMPLEX * SAMPLEY;
 
 struct Intersection{
@@ -47,44 +47,83 @@ float hash12n(vec2 p) {
 	return fract(p.x * p.y * 95.4323);
 }
 
-vec3 GetBall1Pos(in float t) {
-	return vec3(-0.28, 3.719, 1.0);
+
+mat3 RotateAxisXY(vec3 axis, float angle)
+{
+    float sn = sin(angle);
+    float cs = cos(angle);
+    float tc = 1.0 - cs;
+    return mat3(
+		vec3(tc * axis.x * axis.x + cs, tc * axis.x * axis.y, sn * axis.y),
+        vec3(tc * axis.x * axis.y, tc * axis.y * axis.y + cs, -sn * axis.x),
+        vec3(-sn * axis.y, sn * axis.x, cs)
+    );
 }
 
-vec3 GetBall1TextureTransformation(in float t, in vec3 v) {
-	return vec3(((v.x * 0.014 + v.y * -0.349) + v.z * 0.937), ((v.x * -0.362 + v.y * 0.872) + v.z * 0.33), ((v.x * -0.932 + v.y * -0.344) + v.z * -0.114));
+vec3 GetBall1Pos (in float t)
+{
+    return vec3(-0.278, 3.745, 1.0);
 }
 
-vec3 GetBall9Pos(in float t) {
-	return t < 0.5 ? (vec3(0.023, 0.727, 1.0) + t * vec3(0.189, 0.082, 0.0) / 0.5) : t >= 0.5 ? (vec3(0.212, 0.809, 1.0) + (t - 0.5) * vec3(0.176, 0.369, 0.0) / 0.5) : vec3(0.0, 0.0, 0.0);
+vec3 GetBall1TextureTransformation (in float t, in vec3 v)
+{
+    return v * mat3(vec3(0.019, -0.412, 0.911), vec3(-0.353, 0.85, 0.392), vec3(-0.936, -0.329, -0.129));
 }
 
-vec3 GetBall9TextureTransformation(in float t, in vec3 v) {
-	return t < 0.5 ? vec3(((v.x * (-0.151 + t * 0.051 / 0.5) + v.y * (0.039 + t * 0.028 / 0.5)) + v.z * (0.988 + t * 0.005 / 0.5)), ((v.x * (-0.349 + t * 0.172 / 0.5) + v.y * (-0.937 + t * -0.046 / 0.5)) + v.z * (-0.016 + t * 0.065 / 0.5)), ((v.x * (0.925 + t * 0.054 / 0.5) + v.y * (-0.347 + t * 0.177 / 0.5)) + v.z * (0.155 + t * -0.044 / 0.5))) : t >= 0.5 ? vec3(((v.x * (-0.101 + (t - 0.5) * 0.172 / 0.5) + v.y * (0.068 + (t - 0.5) * 0.484 / 0.5)) + v.z * (0.993 + (t - 0.5) * -0.162 / 0.5)), ((v.x * (-0.177 + (t - 0.5) * 0.305 / 0.5) + v.y * (-0.983 + (t - 0.5) * 0.152 / 0.5)) + v.z * (0.049 + (t - 0.5) * 0.492 / 0.5)), ((v.x * (0.979 + (t - 0.5) * 0.01 / 0.5) + v.y * (-0.17 + (t - 0.5) * 0.238 / 0.5)) + v.z * (0.111 + (t - 0.5) * -0.241 / 0.5))) : vec3(0.0, 0.0, 0.0);
+vec3 GetBall9Pos (in float t)
+{
+    return t < 0.33 ?
+        vec3(0.024, 0.731, 1.0) + t * vec3(0.19, 0.082, 0.0) / 0.33 : 
+        vec3(0.214, 0.813, 1.0) + (t - 0.33) * vec3(0.177, 0.37, 0.0) / 0.67;
 }
 
-vec3 GetBall8Pos(in float t) {
-	return t < 0.3 ? vec3(2.038, -0.065, 1.0) : t >= 0.3 && t < 0.7 ? (vec3(2.038, -0.065, 1.0) + (t - 0.3) * vec3(0.237, -0.085, 0.0) / 0.4) : t >= 0.7 ? vec3(2.275, -0.151, 1.0) : vec3(0.0, 0.0, 0.0);
+vec3 GetBall9TextureTransformation (in float t, in vec3 v)
+{
+    return t < 0.33 ?
+        v * RotateAxisXY(vec3(0.395, -0.919, 0.0), 0.207 * t / 0.33) * mat3(vec3(0.028, 0.103, 0.978), vec3(0.138, -0.994, 0.131), vec3(0.957, 0.055, 0.276)) : 
+        v * RotateAxisXY(vec3(0.902, -0.433, 0.0), 0.41 * (t - 0.33) / 0.67) * mat3(vec3(0.034, 0.184, 0.978), vec3(0.134, -0.981, 0.189), vec3(0.975, 0.07, 0.089));
 }
 
-vec3 GetBall8TextureTransformation(in float t, in vec3 v) {
-	return t < 0.3 ? vec3(((v.x * -0.254 + v.y * -0.041) + v.z * 0.966), ((v.x * 0.007 + v.y * -0.999) + v.z * -0.041), ((v.x * 0.967 + v.y * -0.003) + v.z * 0.254)) : t >= 0.3 && t < 0.7 ? vec3(((v.x * (-0.254 + (t - 0.3) * 0.249 / 0.4) + v.y * (-0.041 + (t - 0.3) * -0.032 / 0.4)) + v.z * (0.966 + (t - 0.3) * 0.031 / 0.4)), ((v.x * (0.007 + (t - 0.3) * -0.001 / 0.4) + v.y * (-0.999 + (t - 0.3) * 0.002 / 0.4)) + v.z * (-0.041 + (t - 0.3) * -0.032 / 0.4)), ((v.x * (0.967 + (t - 0.3) * 0.033 / 0.4) + v.y * (-0.003 + (t - 0.3) * 0.009 / 0.4)) + v.z * (0.254 + (t - 0.3) * -0.249 / 0.4))) : t >= 0.7 ? vec3(((v.x * -0.004 + v.y * -0.073) + v.z * 0.997), ((v.x * 0.006 + v.y * -0.997) + v.z * -0.073), ((v.x * 1.0 + v.y * 0.006) + v.z * 0.005)) : vec3(0.0, 0.0, 0.0);
+vec3 GetBall8Pos (in float t)
+{
+    return t < 0.33 ?
+        vec3(2.047, -0.078, 1.0) : 
+        t < 0.735 ?
+            vec3(2.047, -0.078, 1.0) + (t - 0.33) * vec3(0.238, -0.087, 0.0) / 0.405 : 
+            vec3(2.285, -0.166, 1.0);
 }
 
-vec3 GetBall4Pos(in float t) {
-	return t < 0.5 ? vec3(3.875, -1.326, 1.0) : (vec3(3.875, -1.326, 1.0) + (t - 0.5) * vec3(0.134, -0.096, 0.0) / 0.5);
+vec3 GetBall8TextureTransformation (in float t, in vec3 v)
+{
+    return t < 0.33 ?
+        v * mat3(vec3(-0.29, -0.038, 0.956), vec3(0.003, -0.999, -0.038), vec3(0.957, -0.008, 0.29)) : 
+        t < 0.735 ?
+            v * RotateAxisXY(vec3(-0.344, -0.939, 0.0), 0.253 * (t - 0.33) / 0.405) * mat3(vec3(-0.29, -0.038, 0.956), vec3(0.003, -0.999, -0.038), vec3(0.957, -0.008, 0.29)) : 
+            v * mat3(vec3(-0.275, -0.123, 0.991), vec3(-0.008, -0.992, -0.124), vec3(0.932, -0.024, 0.055));
 }
 
-vec3 GetBall4TextureTransformation(in float t, in vec3 v) {
-	return t < 0.5 ? vec3(((v.x * -0.667 + v.y * 0.169) + v.z * 0.725), ((v.x * 0.145 + v.y * -0.926) + v.z * 0.349), ((v.x * 0.731 + v.y * 0.338) + v.z * 0.593)) : vec3(((v.x * (-0.667 + (t - 0.5) * 0.147 / 0.5) + v.y * (0.169 + (t - 0.5) * -0.063 / 0.5)) + v.z * (0.725 + (t - 0.5) * 0.122 / 0.5)), ((v.x * (0.145 + (t - 0.5) * 0.05 / 0.5) + v.y * (-0.926 + (t - 0.5) * -0.026 / 0.5)) + v.z * (0.349 + (t - 0.5) * -0.11 / 0.5)), ((v.x * (0.731 + (t - 0.5) * 0.101 / 0.5) + v.y * (0.338 + (t - 0.5) * -0.049 / 0.5)) + v.z * (0.593 + (t - 0.5) * -0.119 / 0.5)));
+vec3 GetBall4Pos (in float t)
+{
+    return t < 0.735 ?
+        vec3(3.891, -1.358, 1.0) : 
+        vec3(3.891, -1.358, 1.0) + (t - 0.735) * vec3(0.135, -0.097, 0.0) / 0.265;
 }
 
-vec3 GetBallwPos(in float t) {
-	return vec3(-2.633, -0.532, 1.0) + t * vec3(-0.028, 0.087, 0.0);
+vec3 GetBall4TextureTransformation (in float t, in vec3 v)
+{
+    return t < 0.735 ?
+        v * mat3(vec3(-0.708, 0.189, 0.681), vec3(0.127, -0.914, 0.385), vec3(0.695, 0.359, 0.623)) : 
+        v * RotateAxisXY(vec3(-0.585, -0.811, 0.0), 0.166 * (t - 0.735) / 0.265) * mat3(vec3(-0.708, 0.189, 0.681), vec3(0.127, -0.914, 0.385), vec3(0.695, 0.359, 0.623));
 }
 
-vec3 GetBallwTextureTransformation(in float t, in vec3 v) {
-	return v;
+vec3 GetBallwPos (in float t)
+{
+    return vec3(-2.645, -0.519, 1.0) + t * vec3(-0.028, 0.088, 0.0);
+}
+
+vec3 GetBallwTextureTransformation (in float t, in vec3 v)
+{
+    return v;
 }
 
 Camera GetCamera() {
@@ -309,6 +348,7 @@ vec3 Render(Ray ray, int nr, float t) {
             vec3 color = entityColor[intsec.obj];
             if (intsec.obj < 4) // Balls with texture
             {
+                intsec.tnrm = normalize(intsec.tnrm);
                 vec2 uv = vec2(
                         atan(intsec.tnrm.y, intsec.tnrm.x) / TEXTUREANGLE,
                         atan(intsec.tnrm.z, length(intsec.tnrm.xy)) / TEXTUREANGLE);
@@ -357,7 +397,7 @@ vec3 Render(Ray ray, int nr, float t) {
         } 
         else 
         {
-            float jitter = (1.0 - iter) * 0.05;
+            float jitter = (1.0 - iter) * 0.01;
             float a = hash12n(ray.rd.xy) * jitter;
             float b = hash12n(ray.rd.yx) * jitter;
             vec3 hor = normalize(cross(ray.rd, vec3(ray.rd.y, 0.0, ray.rd.x)));
@@ -388,13 +428,14 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 		for (float smpy = 0.0; smpy < SAMPLEX; smpy += 1.0) 
         {  
             // time: 0..1 with jitter
-            float time = mod(iTime, 5.0) - 2.5 + ((smpx * SAMPLEY + smpy) + hash12n(fragCoord)) * 0.1 / SAMPLES;
+            float time = mod(iTime * 3.0, 5.0) - 2.5 + ((smpx * SAMPLEY + smpy) + hash12n(fragCoord)) * 0.5 / SAMPLES;
+            //float time = ((smpx * SAMPLEY + smpy) + hash12n(fragCoord)) * 1.0 / SAMPLES;
             
             // position jitter
             vec2 offs = vec2(
                 (smpx + hash12n(fragCoord.yx)) / SAMPLEX,
                 (smpy + hash12n(fragCoord.xy)) / SAMPLEY
-            );
+            ) * 2.0;
             
             Ray ray = GetCameraRay(camera, fragCoord + offs);
             color = color + Render(ray, 1, time);

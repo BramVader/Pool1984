@@ -845,6 +845,40 @@ namespace Pool1984
             RenderBox.Invalidate();
         }
 
+        // Assume the 9, 8 and 4 ball move all the same speed
+        private IEnumerable<Keyframe> CorrectKeyframesForSpeed(IEnumerable<Keyframe> frames)
+        {
+            var dict = frames.ToDictionary(it => it.StartPosition.Name);
+
+            // It starts with the 9-ball
+            var frame1 = dict["Ball 9a"];
+            var frame2 = dict["Ball 9b"];
+            double dur1 = (frame1.EndPosition.Center - frame1.StartPosition.Center).Length;
+            double dur2 = (frame2.EndPosition.Center - frame2.StartPosition.Center).Length;
+
+            // It hits the 8-ball
+            var frame3 = dict["Ball 8a"];
+            double dur3 = (frame3.EndPosition.Center - frame3.StartPosition.Center).Length;
+
+            // Which hits the 4-ball
+            var frame4 = dict["Ball 4a"];
+            double dur4 = (frame4.EndPosition.Center - frame4.StartPosition.Center).Length;
+
+            // Total duration of the animation, should be mapped to 0..1
+            double totaldur = dur1 + dur3 + dur4;
+
+            // Correct times
+            dict["Ball 9a"].StartTime = 0.0;
+            dict["Ball 9a"].EndTime = dur1 / totaldur;
+            dict["Ball 9b"].StartTime = frame1.EndTime;
+            dict["Ball 9b"].EndTime = 1.0; // It keeps rolling
+            dict["Ball 8a"].StartTime = frame1.EndTime;
+            dict["Ball 8a"].EndTime = frame1.EndTime + dur3 / totaldur;
+            dict["Ball 4a"].StartTime = frame3.EndTime;
+            dict["Ball 4a"].EndTime = frame3.EndTime + dur4 / totaldur;
+            return dict.Values;
+        }
+
         // Calculations
         private void CalcScene()
         {
@@ -1077,9 +1111,10 @@ namespace Pool1984
             }
 
             // Apply keyframes
+            var correctedKeyframes = CorrectKeyframesForSpeed(keyframes);
             foreach (var primitive in primitives.Values.OfType<Ball>())
             {
-                primitive.ApplyKeyframes(keyframes);
+                primitive.ApplyKeyframes(correctedKeyframes);
             }
 
             CalibrateColors();
