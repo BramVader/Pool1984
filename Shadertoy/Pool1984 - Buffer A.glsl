@@ -1,3 +1,23 @@
+// **** POOL1984 ****
+// Created by Observer (Bram Vader)
+// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+//
+// This shader is the result of a project that attempts to recreate the "Pixar 1984 pool ball shot", mentioned 
+// in the paper "Distributed Ray Tracing" by Robert L. Cook, Thomas Porter and Loren Carpenter (1984) which can
+// be found here: https://graphics.pixar.com/library/DistributedRayTracing/.
+//
+// The principles described in this paper are used to recreate the picture, which can be found at the end of the
+// paper and also on the web page as a thumbnail.  The thumbnail, which is an image of 778x669 pixels is the best 
+// quality we have, as far as I know. Another paper "Stochastic Sampling in Computer Graphics" by Robert L. Cook 
+// (1986) contains a close-up of "1984" which is used as well to better reproduce a part of the environment map.
+//
+// To calculate all positions, lights, textures and animations, a C#-program Pool1984.exe was made, which can be 
+// found on https://github.com/BramVader/Pool1984.
+// The most time-consuming part was creating Buffer A that contains the cubemap that reflects the environment, 
+// mirrored in the balls.
+//
+// --> Buffer A: Cubemap
+
 // *** Drawing functions
 
 // Draws a line through p1 and p2
@@ -113,20 +133,20 @@ float palmtrees(in vec2 uv)
     return 0.0;
 }
 
-#define xin(a,b) step(a, uv.x) * step(uv.x, b)
-#define xout(a,b) (step(uv.x, a) + step(b, uv.x))
-#define yin(a,b) step(a, uv.y) * step(uv.y, b)
-#define yout(a,b) (step(uv.y, a) + step(b, uv.y))
+#define XIN(a,b) step(a, uv.x) * step(uv.x, b)
+#define XOUT(a,b) (step(uv.x, a) + step(b, uv.x))
+#define YIN(a,b) step(a, uv.y) * step(uv.y, b)
+#define YOUT(a,b) (step(uv.y, a) + step(b, uv.y))
 
 float windowPattern(in vec2 uv)
 {
     return
-        xin(0.0, 39.0) *( yin(0.0, 65.0) + yin(73.0, 237.0) ) +
-        xin(63.0, 153.0) *( yin(39.0, 179.0) + yin(196.0, 255.0) ) *
-        (max( xout(81.0, 85.0) * xout(136.0, 140.0), step(uv.y, 179.0) ) ) +
+        XIN(0.0, 39.0) *( YIN(0.0, 65.0) + YIN(73.0, 237.0) ) +
+        XIN(63.0, 153.0) *( YIN(39.0, 179.0) + YIN(196.0, 255.0) ) *
+        (max( XOUT(81.0, 85.0) * XOUT(136.0, 140.0), step(uv.y, 179.0) ) ) +
 
-        xin(158.0, 255.0) *( yin(39.0, 212.0) + yin(226.0, 237.0) + yin(244.0, 255.0)) *
-        (max( xout(174.0, 178.0) * xout(229.0, 233.0), step(uv.y, 212.0) ) );
+        XIN(158.0, 255.0) *( YIN(39.0, 212.0) + YIN(226.0, 237.0) + YIN(244.0, 255.0)) *
+        (max( XOUT(174.0, 178.0) * XOUT(229.0, 233.0), step(uv.y, 212.0) ) );
 }
 
 vec3 windowPart(in vec2 uv)
@@ -155,7 +175,7 @@ vec3 sunlightPart(in vec2 uv)
     // A chair (?)
     const vec2 dv = vec2(45.0, 86.9);
     d2 =
-        xin(75.0, 142.3) * step(uv.y, 262.6) *
+        XIN(75.0, 142.3) * step(uv.y, 262.6) *
         max(
             step(1.0, length((uv - vec2(113.0, 263.3)) / dv)) *
             step(length((uv - vec2(113.0, 222.5)) / dv), 1.0) +
@@ -164,7 +184,7 @@ vec3 sunlightPart(in vec2 uv)
             step(1.0, length((uv - vec2(113.0, 148.0)) / dv)) *
             step(length((uv - vec2(113.0, 116.9)) / dv), 1.0),
 
-            xout(82.9, 134.4) * yin(0.0, 180.0)
+            XOUT(82.9, 134.4) * YIN(0.0, 180.0)
         );
     d1 = d2 > d1.w ? vec4(1.0, 1.0, 0.5, 1.0) * d2 : d1;
 
@@ -203,7 +223,7 @@ vec3 lightspotPart(in vec2 uv)
         * vec3(1.0);
 }
 
-// *** Neon sign 1 (probably displaying 'Bud light')
+// *** Neon sign 1 (displaying 'Bud light')
 vec3 bud[] = vec3[](
     vec3(10.0, 104.2, 155.3), vec3(11.0, 104.3, 109.3), vec3(12.0, 136.6, 93.3),  vec3(13.0, 143.9, 97.8),  vec3(12.0, 148.4, 104.2),
     vec3(13.0, 149.5, 112.0), vec3(11.0, 149.5, 153.6), vec3(12.0, 145.7, 157.4), vec3(13.0, 141.9, 153.3), vec3(11.0, 141.4, 110.0),
@@ -236,7 +256,7 @@ vec3 bud[] = vec3[](
     vec3(33.0, 255.0, 17.0),  vec3(31.0, 254.6, 160.3), vec3(32.0, 249.9, 172.7), vec3(33.0, 237.3, 177.2), vec3(31.0, 16.8, 177.1)
 );
 
-vec3 neonSign1(vec2 uv)
+vec3 neonSign1(in vec2 uv)
 {
     vec4 d1 = vec4(1E12);
     float d2;
@@ -300,16 +320,22 @@ vec3 neonSign3(in vec2 uv)
 }
 
 
-void mainImage( out vec4 fragColor, in vec2 fragCoord )
+void mainImage(out vec4 fragColor, in vec2 fragCoord )
 {
-    if (iFrame > 2) discard;
+    float key = iResolution.y * 1000.0 + iResolution.x;
+    fragColor = texture(iChannel0, fragCoord / iResolution.xy);
     
-    vec2 uv = fragCoord.xy * vec2(900.0, 600.0) / iResolution.xy - vec2(22.0, 33.0);
-    fragColor.rgb =
-        windowPart(uv) +
-        sunlightPart(uv - vec2(300.0, 0.0)) +
-        lightspotPart(uv - vec2(600.0, 0.0)) +
-        neonSign1(uv - vec2(0.0, 300.0)) +
-        neonSign2(uv - vec2(300.0, 300.0)) +
-        neonSign3(uv - vec2(600.0, 300.0));
+    if (abs(fragColor.w - key) > 0.1)
+    {
+        vec2 uv = fragCoord.xy * vec2(900.0, 600.0) / iResolution.xy - vec2(22.0, 33.0);
+        fragColor = vec4(
+            windowPart(uv) +
+            sunlightPart(uv - vec2(300.0, 0.0)) +
+            lightspotPart(uv - vec2(600.0, 0.0)) +
+            neonSign1(uv - vec2(0.0, 300.0)) +
+            neonSign2(uv - vec2(300.0, 300.0)) +
+            neonSign3(uv - vec2(600.0, 300.0)),
+            key
+       );
+   }
 }

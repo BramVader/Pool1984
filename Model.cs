@@ -18,12 +18,12 @@ namespace Pool1984
 
         public CubeTexture CubeMap { get; set; }
 
-        public double Reflection { get; set; } = 0.4;
+        public double Reflection { get; set; } = 0.3;
 
-        public int NrSamplesX { get; set; } = 3;
+        public int NrSamplesX { get; set; } = 4;
 
-        public int NrSamplesY { get; set; } = 3;
+        public int NrSamplesY { get; set; } = 4;
 
-        public int IterationDepth { get; set; } = 3;
+        public int IterationDepth { get; set; } = 2;
     }
 }

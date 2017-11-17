@@ -132,8 +132,8 @@ namespace Pool1984.Exporters
 
             var sb = new StringBuilder();
             sb.AppendLine("const float PI = acos(0.0) * 2.0;");
-            sb.AppendLine($"const float MINDIST = {DoubleToString(Intersection.MinDistance)};");
-            sb.AppendLine($"const float MAXDIST = {DoubleToString(Intersection.MaxDistance)};");
+            sb.AppendLine($"const float MINDIST = 0.001;");
+            sb.AppendLine($"const float MAXDIST = 1000.0;");
             sb.AppendLine($"const float TEXTUREANGLE = {DoubleToString(Ball.TextureAngle)};");
             sb.AppendLine($"const vec3 AMBIENT = {ColToString(model.AmbientColor)};");
             sb.AppendLine($"const float REFL = {DoubleToString(model.Reflection)};");
